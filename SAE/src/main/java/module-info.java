@@ -5,6 +5,6 @@ module org.example.sae {
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
 
-    opens org.example.sae to javafx.fxml;
-    exports org.example.sae;
+    opens source to javafx.fxml;
+    exports source;
 }
