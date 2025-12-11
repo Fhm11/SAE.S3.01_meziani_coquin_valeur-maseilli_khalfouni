@@ -1,4 +1,4 @@
-package main.java.source;
+package source;
 
 public interface Observateur {
 

@@ -1,4 +1,4 @@
-package main.java.source;
+package source;
 
 public class Tache {
     private String titre;

@@ -1,4 +1,4 @@
-package main.java.source;
+package source;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
