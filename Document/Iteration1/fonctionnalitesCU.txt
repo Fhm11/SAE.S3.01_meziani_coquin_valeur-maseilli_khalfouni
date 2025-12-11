@@ -1,0 +1,11 @@
+Les fonctionnalités à développer seront :
+
+- créer une tâche
+- afficher la liste des tâches
+- ajouter une description à une tâche
+
+Rôles : 
+
+Fahim fera la 1ère fonctionnalité
+Arnaud fera la 2ème
+Fady fera la 3ème 
