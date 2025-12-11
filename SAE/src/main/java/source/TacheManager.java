@@ -6,9 +6,12 @@ public class TacheManager implements Sujet {
 
     private static TacheManager instance;
     private ArrayList<Observateur> observateurs;
+    private ArrayList<Tache> listeTaches;
 
     private TacheManager() {
+
         observateurs = new ArrayList<>();
+        listeTaches = new ArrayList<>();
     }
 
     public static synchronized TacheManager getInstance() {
@@ -17,6 +20,7 @@ public class TacheManager implements Sujet {
         }
         return instance;
     }
+
 
     @Override
     public void ajouterObservateur(Observateur o) {
@@ -35,5 +39,16 @@ public class TacheManager implements Sujet {
         for (Observateur o : observateurs) {
             o.actualiser();
         }
+    }
+
+    public void ajouterTache(Tache t) {
+        if (t != null) {
+            listeTaches.add(t);
+            notifierObservateur();
+        }
+    }
+
+    public ArrayList<Tache> getTaches() {
+        return listeTaches;
     }
 }
