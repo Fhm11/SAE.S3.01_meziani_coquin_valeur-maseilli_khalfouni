@@ -26,12 +26,13 @@ public class PopupCreationTache {
         btnSave.setOnAction(e -> {
             String titre = txtTitre.getText();
             String desc = txtDesc.getText();
-
-            Tache t = TacheFactory.creerTache(titre, desc);
-
-            TacheManager.getInstance().ajouterTache(t);
-
-            fenetre.close();
+            try {
+                Tache t = TacheFactory.creerTache(titre, desc);
+                TacheManager.getInstance().ajouterTache(t);
+                fenetre.close();
+            } catch (IllegalArgumentException ex) {
+                System.err.println("ta oubleir qqch : " + ex.getMessage());
+            }
         });
 
         root.getChildren().addAll(lblTitre, txtTitre, lblDesc, txtDesc, btnSave);
