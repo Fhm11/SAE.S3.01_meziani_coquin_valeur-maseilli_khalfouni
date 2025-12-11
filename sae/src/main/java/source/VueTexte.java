@@ -1,4 +1,4 @@
-package source;
+package main.java.source;
 
 public class VueTexte implements Observateur {
 
