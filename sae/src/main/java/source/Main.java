@@ -10,15 +10,15 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        VueTexte vue = new VueTexte();
+        VBox root = new VBox(10);
+        VueBureau vue = new VueBureau();
         TacheManager.getInstance().ajouterObservateur(vue);
         Button btnCreer = new Button("Créer une tâche");
         btnCreer.setOnAction(e -> PopupCreationTache.afficherPopup());
-        VBox root = new VBox(20);
-        root.getChildren().add(btnCreer);
-        Scene scene = new Scene(root, 300, 200);
+        root.getChildren().addAll(btnCreer, vue.getRoot());
+        Scene scene = new Scene(root, 400, 400);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("test");
+        primaryStage.setTitle("vue bureau");
         primaryStage.show();
     }
 
