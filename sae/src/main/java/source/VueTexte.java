@@ -3,7 +3,7 @@ package source;
 public class VueTexte implements Observateur {
 
     public void actualiser() {
-        System.out.println("toutees les taches faites dans al onsole poru test:");
+        System.out.println("toutes les taches faites dans la console pour test:");
         for (Tache t : TacheManager.getInstance().getTaches()) {
             System.out.println(t);
         }

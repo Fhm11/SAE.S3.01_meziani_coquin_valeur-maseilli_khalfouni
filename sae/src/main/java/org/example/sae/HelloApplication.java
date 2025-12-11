@@ -1,4 +1,4 @@
-package main.java.org.example.sae;
+package org.example.sae;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
