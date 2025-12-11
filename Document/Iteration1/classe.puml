@@ -1,0 +1,68 @@
+@startuml
+
+    interface Observateur {
+        + actualiser()
+    }
+
+    interface Sujet {
+        + ajouterObservateur(o : Observateur)
+        + supprimerObservateur(o : Observateur)
+        + notifierObservateur()
+    }
+
+    class Tache {
+        - titre : String
+        - description : String
+        + Tache(titre : String, description : String)
+        + getTitre() : String
+        + getDescription() : String
+        + toString() : String
+    }
+
+    class TacheFactory {
+        + creerTache(titre : String, description : String) : Tache
+    }
+
+    class TacheManager {
+        - static instance : TacheManager
+        - observateurs : ArrayList<Observateur>
+        - listeTaches : ArrayList<Tache>
+        + getInstance() : TacheManager
+        + ajouterObservateur(o : Observateur)
+        + supprimerObservateur(o : Observateur)
+        + notifierObservateur()
+        + ajouterTache(t : Tache)
+        + getTaches() : ArrayList<Tache>
+    }
+
+    class VueTexte {
+        + actualiser()
+    }
+
+    class Controller {
+        - manager : TacheManager
+        + Controller()
+        + creerTache(titre : String, description : String)
+        + supprimerTache(t : Tache)
+    }
+
+    class PopupCreationTache {
+        + afficherPopup()
+    }
+
+
+
+    TacheFactory --> Tache 
+    Controller --> TacheFactory 
+    Controller --> TacheManager
+    PopupCreationTache --> TacheFactory 
+    PopupCreationTache --> TacheManager 
+
+    VueTexte ..|> Observateur
+    TacheManager ..|> Sujet
+    TacheManager --> Observateur : notifie 
+    TacheManager --> Tache : contient 
+
+
+
+@enduml
