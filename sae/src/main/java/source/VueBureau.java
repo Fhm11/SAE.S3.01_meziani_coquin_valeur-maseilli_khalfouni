@@ -9,19 +9,32 @@ import javafx.scene.paint.Color;
 import javafx.scene.control.Label;
 import javafx.geometry.Insets;
 
+/**
+ * Classe qui permet d'afficher la vue Bureau
+ */
 public class VueBureau implements Observateur {
 
     private VBox root;
 
+    /**
+     * Constructeur pour créer la vue
+     */
     public VueBureau() {
         root = new VBox(10);
         root.setPadding(new Insets(10));
     }
 
+    /**
+     * Getter pour l'attribut root
+     * @return le root
+     */
     public VBox getRoot() {
         return root;
     }
 
+    /**
+     * Méthode actualiser qui permet de mettre à jour la vue
+     */
     @Override
     public void actualiser() {
         root.getChildren().clear();

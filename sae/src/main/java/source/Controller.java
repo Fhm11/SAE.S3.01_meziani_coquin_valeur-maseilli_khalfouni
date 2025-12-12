@@ -14,7 +14,6 @@ public class Controller {
     }
 
     public void supprimerTache(Tache t) {
-        // Tu peux l’ajouter dans TacheManager si besoin
         manager.getTaches().remove(t);
         manager.notifierObservateur();
     }
