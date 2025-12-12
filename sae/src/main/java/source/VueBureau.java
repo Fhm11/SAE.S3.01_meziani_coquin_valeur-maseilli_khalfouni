@@ -42,7 +42,10 @@ public class VueBureau implements Observateur {
             HBox rectangle = new HBox();
             rectangle.setPadding(new Insets(10));
             rectangle.setSpacing(10);
-            rectangle.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, new CornerRadii(5), Insets.EMPTY)));
+            rectangle.setStyle(
+                    "-fx-background-color: lightblue; " +
+                            "-fx-background-radius: 5;"
+            );
             Label label = new Label(t.getTitre() + "\n" + t.getDescription());
             rectangle.getChildren().add(label);
             root.getChildren().add(rectangle);

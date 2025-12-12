@@ -39,6 +39,6 @@ public class Tache {
      */
     @Override
     public String toString() {
-        return "tache : " + titre + " | " + description;
+        return "tache : " + titre + " : "  + description;
     }
 }
