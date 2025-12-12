@@ -26,8 +26,7 @@ Cette application permet de créer des **tableaux**, des **listes** à l'intéri
 
 * **Meziani**
 * **Coquin**
-* **Valeur**
-* **Maselli**
+* **Valeur-Maselli**
 * **Khalfouni**
 
 
