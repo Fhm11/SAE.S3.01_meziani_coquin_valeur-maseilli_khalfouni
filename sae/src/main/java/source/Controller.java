@@ -12,9 +12,4 @@ public class Controller {
         Tache t = TacheFactory.creerTache(titre, description);
         manager.ajouterTache(t);
     }
-
-    public void supprimerTache(Tache t) {
-        manager.getTaches().remove(t);
-        manager.notifierObservateur();
-    }
 }

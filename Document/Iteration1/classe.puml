@@ -43,22 +43,29 @@
         - manager : TacheManager
         + Controller()
         + creerTache(titre : String, description : String)
-        + supprimerTache(t : Tache)
     }
 
-    class PopupCreationTache {
+    class Formulaire {
         + afficherPopup()
     }
+    
+    class VueBureau {
+    - root : VBox
+    + VueBureau()
+    + getRoot() : VBox
+    + actualiser()
+}
 
 
 
     TacheFactory --> Tache 
     Controller --> TacheFactory 
     Controller --> TacheManager
-    PopupCreationTache --> TacheFactory 
-    PopupCreationTache --> TacheManager 
+    Formulaire --> TacheFactory 
+    Formulaire --> TacheManager 
 
     VueTexte ..|> Observateur
+    VueBureau ..|> Observateur
     TacheManager ..|> Sujet
     TacheManager --> Observateur : notifie 
     TacheManager --> Tache : contient 
