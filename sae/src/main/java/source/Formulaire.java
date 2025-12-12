@@ -8,8 +8,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+/**
+ * Classe formulaire pour afficher le formulaire de création de tâches
+ */
 public class Formulaire {
 
+    /**
+     * Méthode qui affiche le popup lorsqu'on clic sur le bouton
+     * créer une tâche
+     */
     public static void afficherPopup() {
         Stage fenetre = new Stage();
         VBox root = new VBox(10);
