@@ -50,8 +50,8 @@ public class Formulaire {
         fenetre.show();
     }
 
-    public static void modifierTache(Tache t) {
-        Stage fenetre = new  Stage();
+    public static void modifierTache(Tache t, Controller controller) {
+        Stage fenetre = new Stage();
         VBox root = new VBox(10);
         root.setPadding(new Insets(10));
 
@@ -65,7 +65,7 @@ public class Formulaire {
 
         btnSave.setOnAction(e -> {
             try {
-                c.modifierTache(t,txtTitre.getText(),txtDesc.getText());
+                controller.modifierTache(t, txtTitre.getText(), txtDesc.getText());
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
                 System.err.println(ex.getMessage());
@@ -75,6 +75,38 @@ public class Formulaire {
         root.getChildren().addAll(lblTitre, txtTitre, lblDesc, txtDesc, btnSave);
         fenetre.setScene(new Scene(root, 300, 200));
         fenetre.setTitle("Modifier la tâche");
+        fenetre.show();
+    }
+
+    public static void afficherPopupSousTache(Controller controller, Tache parent) {
+        Stage fenetre = new Stage();
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(10));
+
+        Label lblTitre = new Label("Ajouter une sous-tâche à : " + parent.getTitre());
+        Label lblSousTitre = new Label("Titre de la sous-tâche :");
+        TextField txtSousTitre = new TextField();
+
+        Label lblSousDesc = new Label("Description :");
+        TextField txtSousDesc = new TextField();
+
+        Button btnSave = new Button("Ajouter");
+
+        btnSave.setOnAction(e -> {
+            try {
+                // Utiliser une méthode spécifique du Controller
+                controller.ajouterSousTache(parent, txtSousTitre.getText(), txtSousDesc.getText());
+                fenetre.close();
+            } catch (IllegalArgumentException ex) {
+                System.err.println(ex.getMessage());
+            }
+        });
+
+        root.getChildren().addAll(lblTitre, lblSousTitre, txtSousTitre,
+                lblSousDesc, txtSousDesc, btnSave);
+
+        fenetre.setScene(new Scene(root, 300, 250));
+        fenetre.setTitle("Ajouter une sous-tâche");
         fenetre.show();
     }
 }

@@ -18,7 +18,7 @@ public class TacheComposite extends Tache {
     }
 
     @Override
-    public List<Tache> getSousTache() {
+    public List<Tache> getSousTaches() {
         return sousTaches;
     }
 

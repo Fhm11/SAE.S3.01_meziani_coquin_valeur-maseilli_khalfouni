@@ -20,7 +20,7 @@ public class Main extends Application {
         Button btnCreer = new Button("Créer une tâche");
         btnCreer.setOnAction(e -> Formulaire.afficherPopup(c));
         root.getChildren().addAll(btnCreer, vue.getRoot());
-        Scene scene = new Scene(root, 400, 400);
+        Scene scene = new Scene(root, 500, 600);
         primaryStage.setScene(scene);
         primaryStage.setTitle("vue bureau");
         primaryStage.show();

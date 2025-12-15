@@ -57,6 +57,6 @@ public abstract class Tache {
     }
 
     public abstract boolean ajouterSousTache(Tache sousTache);
-    public abstract List<Tache> getSousTache();
+    public abstract List<Tache> getSousTaches();
     public abstract boolean estComposite();
 }
