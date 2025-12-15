@@ -1,9 +1,12 @@
 package source;
 
+import java.util.List;
+
 /**
- * Classe qui gère les tâches
+ * Classe abstraite qui gère les tâches
  */
-public class Tache {
+public abstract class Tache {
+
     private String titre;
     private String description;
 
@@ -52,4 +55,8 @@ public class Tache {
     public String toString() {
         return "tache : " + titre + " : "  + description;
     }
+
+    public abstract boolean ajouterSousTache(Tache sousTache);
+    public abstract List<Tache> getSousTache();
+    public abstract boolean estComposite();
 }
