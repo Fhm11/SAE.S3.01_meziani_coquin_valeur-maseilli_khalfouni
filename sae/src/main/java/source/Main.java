@@ -2,28 +2,23 @@ package source;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-
     @Override
     public void start(Stage primaryStage) {
-        Controller c = new Controller();
-
-        VBox root = new VBox(10);
         VueBureau vue = new VueBureau();
 
+        // enregistrer la vue comme observateur du modèle
         TacheManager.getInstance().ajouterObservateur(vue);
 
-        Button btnCreer = new Button("Créer une tâche");
-        btnCreer.setOnAction(e -> Formulaire.afficherPopup(c));
-        root.getChildren().addAll(btnCreer, vue.getRoot());
-        Scene scene = new Scene(root, 500, 600);
+        Scene scene = new Scene(vue.getRoot(), 500, 600);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("vue bureau");
+        primaryStage.setTitle("Gestionnaire de Tâches MVC Pur");
         primaryStage.show();
+
+        // initialiser l'affichage
+        vue.actualiser();
     }
 
     public static void main(String[] args) {
