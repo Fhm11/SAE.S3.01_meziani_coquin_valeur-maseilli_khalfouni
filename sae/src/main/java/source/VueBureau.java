@@ -1,5 +1,6 @@
 package source;
 
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Background;
@@ -47,6 +48,8 @@ public class VueBureau implements Observateur {
                             "-fx-background-radius: 5;"
             );
             Label label = new Label(t.getTitre() + "\n" + t.getDescription());
+            rectangle.setOnMouseClicked(e -> Formulaire.modifierTache(t));
+
             rectangle.getChildren().add(label);
             root.getChildren().add(rectangle);
             System.out.println(t);
