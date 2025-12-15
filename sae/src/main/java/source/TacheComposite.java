@@ -9,7 +9,7 @@ public class TacheComposite extends Tache {
 
     public TacheComposite(String titre, String description) {
         super(titre, description);
-        this.sousTaches = new ArrayList<>()
+        this.sousTaches = new ArrayList<>();
     }
 
     @Override
