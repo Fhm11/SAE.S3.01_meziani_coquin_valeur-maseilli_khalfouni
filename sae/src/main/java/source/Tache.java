@@ -23,7 +23,7 @@ public abstract class Tache {
     /**
      * Getter pour le titre
      * @return le titre
-     */
+     */ 
     public String getTitre() {
         return titre;
     }

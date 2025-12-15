@@ -48,7 +48,7 @@ public class VueBureau implements Observateur {
                             "-fx-background-radius: 5;"
             );
             Label label = new Label(t.getTitre() + "\n" + t.getDescription());
-            rectangle.setOnMouseClicked(e -> Formulaire.modifierTache(t));
+
 
             rectangle.getChildren().add(label);
             root.getChildren().add(rectangle);
