@@ -15,7 +15,7 @@ public class TacheSimple extends Tache {
     }
 
     @Override
-    public List<Tache> getSousTache() {
+    public List<Tache> getSousTaches() {
         return Collections.emptyList();
     }
 

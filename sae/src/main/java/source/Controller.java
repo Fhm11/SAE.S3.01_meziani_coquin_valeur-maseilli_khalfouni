@@ -19,8 +19,21 @@ public class Controller {
     }
 
     public void modifierTache(Tache t, String titre, String description) {
+        if (titre == null || titre.trim().isEmpty()) {
+            throw new IllegalArgumentException("titre obligatoire");
+        }
+
         t.setTitre(titre);
         t.setDescription(description);
         manager.notifierObservateur();
+    }
+
+    public void ajouterSousTache(Tache parent, String titre, String description) {
+        if (parent == null || !parent.estComposite()) {
+            throw new IllegalArgumentException("Impossible d'ajouter une sous-tâche");
+        }
+
+        Tache sousTache = TacheFactory.creerTacheSimple(titre, description);
+        TacheManager.getInstance().ajouterSousTache(parent, sousTache);
     }
 }

@@ -74,6 +74,22 @@ public class TacheManager implements Sujet {
         }
     }
 
+    public boolean ajouterSousTache(Tache parent, Tache sousTache) {
+        if (parent == null || !parent.estComposite() || sousTache == null) {
+            return false;
+        }
+
+        // cast sécurisé car on a vérifié estComposite()
+        TacheComposite composite = (TacheComposite) parent;
+        boolean result = composite.ajouterSousTache(sousTache);
+
+        if (result) {
+            notifierObservateur();
+        }
+
+        return result;
+    }
+
     /**
      * Getter pour voir la liste des tâches
      * @return la liste de tâches
