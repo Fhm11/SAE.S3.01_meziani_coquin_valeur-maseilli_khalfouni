@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -22,21 +23,28 @@ public class Formulaire {
         Label lblDesc = new Label("Description :");
         TextField txtDesc = new TextField();
 
+        CheckBox chkComposite = new CheckBox("Peut avoir des sous-tâches");
+
         Button btnSave = new Button("Sauvegarder");
 
         btnSave.setOnAction(e -> {
             try {
-                controller.creerTache(
-                        txtTitre.getText(),
-                        txtDesc.getText()
-                );
+                String titre = txtTitre.getText();
+                String description = txtDesc.getText();
+                boolean estComposite = chkComposite.isSelected();
+
+                if (estComposite) {
+                    controller.creerTacheComposite(titre, description);
+                } else {
+                    controller.creerTacheSimple(titre, description);
+                }
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
                 System.err.println(ex.getMessage());
             }
         });
 
-        root.getChildren().addAll(lblTitre, txtTitre, lblDesc, txtDesc, btnSave);
+        root.getChildren().addAll(lblTitre, txtTitre, lblDesc, txtDesc, chkComposite, btnSave);
         fenetre.setScene(new Scene(root, 300, 200));
         fenetre.setTitle("Créer une tâche");
         fenetre.show();

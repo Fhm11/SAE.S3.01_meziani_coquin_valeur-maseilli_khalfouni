@@ -7,17 +7,17 @@ package source;
  */
 public class TacheFactory {
 
-    /**
-     * Méthode qui permet de créer une tâche
-     * @param titre le titre de la tâche
-     * @param description sa description
-     * @return la tâche créé
-     */
-    public static Tache creerTache(String titre, String description) {
+    public static Tache creerTacheSimple(String titre, String description) {
         if (titre == null || titre.trim().isEmpty()) {
-            throw new IllegalArgumentException("titre obliger");
+            throw new IllegalArgumentException("titre obligatoire");
         }
+        return new TacheSimple(titre, description);
+    }
 
-        return new Tache(titre, description);
+    public static Tache creerTacheComposite(String titre, String description) {
+        if (titre == null || titre.trim().isEmpty()) {
+            throw new IllegalArgumentException("titre obligatoire");
+        }
+        return new TacheComposite(titre, description);
     }
 }
