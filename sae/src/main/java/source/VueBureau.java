@@ -84,7 +84,7 @@ public class VueBureau implements Observateur {
                                     "-fx-background-radius: 3;"
                     );
 
-                    Label sousLabel = new Label("  └─ " + sousTache.getTitre() +
+                    Label sousLabel = new Label("  | " + sousTache.getTitre() +
                             "\n      " + sousTache.getDescription());
 
                     // Clic pour modifier la sous-tâche
