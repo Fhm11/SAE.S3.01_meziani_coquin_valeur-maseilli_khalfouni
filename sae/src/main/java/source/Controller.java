@@ -36,4 +36,32 @@ public class Controller {
         Tache sousTache = TacheFactory.creerTacheSimple(titre, description);
         TacheManager.getInstance().ajouterSousTache(parent, sousTache);
     }
+
+    public void supprimerTache(Tache t) {
+        if (t == null) return;
+
+        if (manager.getTaches().contains(t)) {
+            manager.supprimerTache(t);
+            return;
+        }
+
+        TacheComposite parent = trouverParent(t);
+        if (parent != null) {
+            parent.retirerSousTache(t);
+            manager.notifierObservateur();
+        }
+    }
+
+    private TacheComposite trouverParent(Tache enfant) {
+        for (Tache tachePrincipale : manager.getTaches()) {
+            if (tachePrincipale.estComposite()) {
+                TacheComposite parent = (TacheComposite) tachePrincipale;
+                if (parent.getSousTaches().contains(enfant)) {
+                    return parent;
+                }
+            }
+        }
+        return null;
+    }
 }
+

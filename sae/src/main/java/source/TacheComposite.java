@@ -34,4 +34,5 @@ public class TacheComposite extends Tache {
     public int getNombreSousTaches() {
         return sousTaches.size();
     }
+
 }

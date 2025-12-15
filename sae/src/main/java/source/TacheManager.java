@@ -90,6 +90,12 @@ public class TacheManager implements Sujet {
         return result;
     }
 
+    public void supprimerTache(Tache t) {
+        if (t != null && listeTaches.remove(t)) {
+            notifierObservateur();
+        }
+    }
+
     /**
      * Getter pour voir la liste des tâches
      * @return la liste de tâches
