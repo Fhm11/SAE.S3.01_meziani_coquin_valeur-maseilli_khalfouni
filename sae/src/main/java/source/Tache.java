@@ -33,6 +33,17 @@ public class Tache {
         return description;
     }
 
+    public void setTitre(String titre) {
+        if (titre == null || titre.trim().isEmpty()) {
+            throw new IllegalArgumentException("titre obliger");
+        }
+        this.titre = titre;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     /**
      * public pour afficher la tâche
      * @return la tâche avec son titre et sa description

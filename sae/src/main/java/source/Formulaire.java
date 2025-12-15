@@ -8,16 +8,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-/**
- * Classe formulaire pour afficher le formulaire de création de tâches
- */
 public class Formulaire {
 
-    /**
-     * Méthode qui affiche le popup lorsqu'on clic sur le bouton
-     * créer une tâche
-     */
-    public static void afficherPopup() {
+    public static void afficherPopup(Controller controller) {
         Stage fenetre = new Stage();
         VBox root = new VBox(10);
         root.setPadding(new Insets(10));
@@ -31,19 +24,18 @@ public class Formulaire {
         Button btnSave = new Button("Sauvegarder");
 
         btnSave.setOnAction(e -> {
-            String titre = txtTitre.getText();
-            String desc = txtDesc.getText();
             try {
-                Tache t = TacheFactory.creerTache(titre, desc);
-                TacheManager.getInstance().ajouterTache(t);
+                controller.creerTache(
+                        txtTitre.getText(),
+                        txtDesc.getText()
+                );
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
-                System.err.println("ta oubleir qqch : " + ex.getMessage());
+                System.err.println(ex.getMessage());
             }
         });
 
         root.getChildren().addAll(lblTitre, txtTitre, lblDesc, txtDesc, btnSave);
-
         fenetre.setScene(new Scene(root, 300, 200));
         fenetre.setTitle("Créer une tâche");
         fenetre.show();
