@@ -16,7 +16,7 @@ public class VueBureau implements Observateur {
     private VBox colonneEnCours;
     private VBox colonneTermine;
 
-    // Stocker les composants pour configuration par Main
+    // on stocke les composants pour les configurer dans le main
     private List<Button> boutonsInteractifs = new ArrayList<>();
     private List<VBox> cartesTaches = new ArrayList<>();
 
@@ -44,7 +44,7 @@ public class VueBureau implements Observateur {
         return root;
     }
 
-    // Getters pour que Main configure les handlers
+    // getters pour que main configure les handlers
     public List<Button> getBoutonsInteractifs() {
         return boutonsInteractifs;
     }
@@ -99,7 +99,6 @@ public class VueBureau implements Observateur {
         labelDesc.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px;");
         labelDesc.setWrapText(true);
 
-        // Stocker la tâche pour le double-clic
         conteneur.setUserData(t);
 
         HBox boutons = new HBox(5);

@@ -4,15 +4,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 
-/**
- * Contrôleur MVC selon le cours R3.04
- * Implémente EventHandler comme dans l'exemple (page 35)
- */
 public class Controller implements EventHandler<ActionEvent> {
     private TacheManager modele;
     private Tache tacheEnDeplacement;
 
-    // CONSTRUCTEUR avec modèle (comme dans le cours)
     public Controller(TacheManager modele) {
         this.modele = modele;
     }
@@ -31,9 +26,6 @@ public class Controller implements EventHandler<ActionEvent> {
                 if ("Supprimer".equals(btn.getText())) {
                     modele.supprimerTache(t);
                 } else if ("+ Sous-tâche".equals(btn.getText())) {
-                    // Le contrôleur décide d'ouvrir le formulaire
-                    // MAIS pour rester simple, on va appeler VueFormulaire
-                    // C'est acceptable car le contrôleur gère la navigation
                     VueFormulaire.afficherFormulaireSousTache(t, this);
                 }
             }

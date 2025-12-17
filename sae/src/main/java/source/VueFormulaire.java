@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 
 public class VueFormulaire {
 
-    // MODIFIÉ: Prend le contrôleur en paramètre (pas statique dans le contrôleur)
     public static void afficherFormulaireCreation(Controller controleur) {
         Stage fenetre = new Stage();
         VBox root = new VBox(10);
