@@ -23,7 +23,7 @@ public class  VueBureau implements Observateur {
 
         colonneAFaire = creerColonne("afaire");
         colonneEnCours = creerColonne("encours");
-        colonneTermine = creerColonne("termienr");
+        colonneTermine = creerColonne("terminée");
 
         HBox conteneurColonnes = new HBox(15);
         conteneurColonnes.getChildren().addAll(colonneAFaire, colonneEnCours, colonneTermine);
@@ -69,15 +69,20 @@ public class  VueBureau implements Observateur {
             col.getChildren().remove(1, col.getChildren().size());
         }
     }
+
+
     private VBox creerAffichageTache(Tache t) {
         VBox conteneur = new VBox(5);
         conteneur.setPadding(new Insets(10));
         conteneur.setStyle("-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1); -fx-background-radius: 5;");
 
-        Label label = new Label(t.getTitre());
-        label.setStyle("-fx-font-weight: bold;");
+        Label labelTitre = new Label(t.getTitre());
+        labelTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
 
-        // double-clic pour modifier
+        Label labelDesc = new Label(t.getDescription());
+        labelDesc.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px;");
+        labelDesc.setWrapText(true);
+
         conteneur.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
                 VueFormulaire.afficherFormulaireModification(t);
@@ -98,42 +103,25 @@ public class  VueBureau implements Observateur {
         btnSupprimer.setOnAction(e -> Controller.supprimerTache(t));
         boutons.getChildren().add(btnSupprimer);
 
-        conteneur.getChildren().addAll(label, boutons);
+        conteneur.getChildren().addAll(labelTitre, labelDesc, boutons);
 
-        // afficher les sous-tâches si composite
         if (t.estComposite()) {
             for(Tache sub : t.getSousTaches()) {
-                Label l = new Label(" > " + sub.getTitre());
-                l.setStyle("-fx-text-fill: gray; -fx-font-size: 10px;");
-                conteneur.getChildren().add(l);
+                VBox boxSousTache = new VBox(2);
+                boxSousTache.setPadding(new Insets(0, 0, 0, 10));
+
+                Label lTitre = new Label(" > " + sub.getTitre());
+                lTitre.setStyle("-fx-text-fill: #333333; -fx-font-size: 10px; -fx-font-weight: bold;");
+
+                Label lDesc = new Label("   " + sub.getDescription());
+                lDesc.setStyle("-fx-text-fill: gray; -fx-font-size: 9px;");
+                lDesc.setWrapText(true);
+
+                boxSousTache.getChildren().addAll(lTitre, lDesc);
+                conteneur.getChildren().add(boxSousTache);
             }
         }
         return conteneur;
-    }
-
-    private void afficherSousTaches(VBox parentContainer, TacheComposite composite) {
-        VBox sousContainer = new VBox(5);
-        sousContainer.setPadding(new Insets(5, 0, 0, 20));
-
-        for (Tache sousTache : composite.getSousTaches()) {
-            HBox sousBox = new HBox(5);
-            sousBox.setPadding(new Insets(5));
-            sousBox.setStyle("-fx-background-color: #e6f3ff; -fx-background-radius: 3;");
-
-            Label sousLabel = new Label("  | " + sousTache.getTitre() +
-                    "\n      " + sousTache.getDescription());
-
-            sousBox.setOnMouseClicked(e -> {
-                if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
-                    VueFormulaire.afficherFormulaireModification(sousTache);
-                }
-            });
-
-            sousBox.getChildren().add(sousLabel);
-            sousContainer.getChildren().add(sousBox);
-        }
-
-        parentContainer.getChildren().add(sousContainer);
     }
 
     private VBox creerColonne(String titre) {
