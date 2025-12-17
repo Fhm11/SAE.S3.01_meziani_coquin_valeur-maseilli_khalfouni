@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
  */
 public class Controller implements EventHandler<ActionEvent> {
     private TacheManager modele;
+    private Tache tacheEnDeplacement;
 
     // CONSTRUCTEUR avec modèle (comme dans le cours)
     public Controller(TacheManager modele) {

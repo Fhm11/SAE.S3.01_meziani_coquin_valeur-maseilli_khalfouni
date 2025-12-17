@@ -53,6 +53,10 @@ public class VueBureau implements Observateur {
         return cartesTaches;
     }
 
+    public VBox getColonneAFaire() { return colonneAFaire; }
+    public VBox getColonneEnCours() { return colonneEnCours; }
+    public VBox getColonneTermine() { return colonneTermine; }
+
     @Override
     public void actualiser() {
         nettoyerColonne(colonneAFaire);

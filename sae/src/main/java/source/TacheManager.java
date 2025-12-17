@@ -101,4 +101,10 @@ public class TacheManager implements Sujet {
         return listeTaches;
     }
 
+    public void deplacerTache(Tache t, String nouvelEtat) {
+        if (t != null && nouvelEtat != null) {
+            t.setEtat(nouvelEtat);
+            notifierObservateur();
+        }
+    }
 }
