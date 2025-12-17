@@ -8,7 +8,7 @@ import source.TacheManager;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class Testtache {
+class TestTache {
 
     private TacheManager manager;
 
@@ -19,41 +19,72 @@ class Testtache {
     }
 
     @Test
-    void testCreationTacheValide() {
-        Tache t = TacheFactory.creerTache("Titre1", "Description1");
-        assertNotNull(t, "tache doit pas etre null ou vide");
-        assertEquals("Titre1", t.getTitre());
-        assertEquals("Description1", t.getDescription());
+    void testCreationTacheSimpleValide() {
+        Tache t = TacheFactory.creerTacheSimple("Titre1", "Description1");
 
-        manager.ajouterTache(t);
-        assertTrue(manager.getTaches().contains(t), "il doit y avaoit la tache ajouter");
+        assertNotNull(t);
+        assertEquals("Titre1", t.getTitre());
+        assertFalse(t.estComposite());
+
+        manager.getTaches().add(t);
+        assertTrue(manager.getTaches().contains(t));
+    }
+
+    @Test
+    void testCreationTacheComposite() {
+        Tache compo = TacheFactory.creerTacheComposite("Projet", "Gros projet");
+        assertTrue(compo.estComposite());
+
+        Tache sousTache = TacheFactory.creerTacheSimple("Sous-tâche", "Détail");
+        compo.ajouterSousTache(sousTache);
+
+        assertEquals(1, compo.getSousTaches().size());
+        assertEquals("Sous-tâche", compo.getSousTaches().get(0).getTitre());
     }
 
     @Test
     void testTitreNull() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            TacheFactory.creerTache(null, "idk");
+            TacheFactory.creerTacheSimple(null, "idk");
         });
-        assertEquals("titre obliger", exception.getMessage());
+        assertEquals("titre obligatoire", exception.getMessage());
     }
 
     @Test
     void testTitreVide() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            TacheFactory.creerTache("", "idk");
+            TacheFactory.creerTacheSimple("", "idk");
         });
-        assertEquals("titre obliger", exception.getMessage());
+        assertEquals("titre obligatoire", exception.getMessage());
     }
 
     @Test
-    void testAjoutMultipleTaches() {
-        Tache t1 = TacheFactory.creerTache("t1", "d1");
-        Tache t2 = TacheFactory.creerTache("t2", "d2");
-        manager.ajouterTache(t1);
-        manager.ajouterTache(t2);
+    void testAjoutViaManager() {
+        manager.creerTacheSimple("T1", "D1");
+        manager.creerTacheComposite("C1", "D2");
 
-        assertEquals(2, manager.getTaches().size(), "doit avoir 2 taches snon faux");
-        assertTrue(manager.getTaches().contains(t1));
-        assertTrue(manager.getTaches().contains(t2));
+        assertEquals(2, manager.getTaches().size());
+        assertTrue(manager.getTaches().get(1).estComposite());
+    }
+
+    @Test
+    void testSuppressionTache() {
+        manager.creerTacheSimple("A supprimer", "desc");
+        Tache t = manager.getTaches().get(0);
+
+        manager.supprimerTache(t);
+
+        assertTrue(manager.getTaches().isEmpty());
+    }
+
+    @Test
+    void testModifierTache() {
+        manager.creerTacheSimple("Ancien Titre", "Ancienne Description");
+        Tache t = manager.getTaches().get(0);
+
+        manager.modifierTache(t, "Nouveau Titre", "Nouvelle Description");
+
+        assertEquals("Nouveau Titre", t.getTitre());
+        assertEquals("Nouvelle Description", t.getDescription());
     }
 }
