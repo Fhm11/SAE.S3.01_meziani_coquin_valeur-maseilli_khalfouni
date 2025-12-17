@@ -16,7 +16,7 @@ public class VueBureau implements Observateur {
     private VBox colonneEnCours;
     private VBox colonneTermine;
 
-    // Stocker les composants pour configuration par Main
+    // on stocke les composants pour les configurer dans le main
     private List<Button> boutonsInteractifs = new ArrayList<>();
     private List<VBox> cartesTaches = new ArrayList<>();
 
@@ -44,7 +44,7 @@ public class VueBureau implements Observateur {
         return root;
     }
 
-    // Getters pour que Main configure les handlers
+    // getters pour que main configure les handlers
     public List<Button> getBoutonsInteractifs() {
         return boutonsInteractifs;
     }

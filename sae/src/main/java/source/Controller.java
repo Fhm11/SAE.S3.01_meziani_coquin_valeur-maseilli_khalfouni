@@ -4,10 +4,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 
-/**
- * Contrôleur MVC selon le cours R3.04
- * Implémente EventHandler comme dans l'exemple (page 35)
- */
 public class Controller implements EventHandler<ActionEvent> {
     private TacheManager modele;
 

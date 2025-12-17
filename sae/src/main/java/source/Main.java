@@ -30,7 +30,7 @@ public class Main extends Application {
         modele.ajouterObservateur(new Observateur() {
             @Override
             public void actualiser() {
-                // Reconfigurer les handlers quand la vue est actualisée
+                // reconfigurer les handlers quand la vue est actualisée
                 configurerHandlers(vue, controleur);
             }
         });
