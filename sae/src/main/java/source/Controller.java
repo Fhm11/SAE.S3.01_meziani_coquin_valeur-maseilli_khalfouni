@@ -48,4 +48,17 @@ public class Controller implements EventHandler<ActionEvent> {
     public void ajouterSousTache(Tache parent, String titre, String description) {
         modele.ajouterSousTache(parent, titre, description);
     }
+
+    // Appelé quand le drag commence
+    public void debuterDeplacement(Tache t) {
+        this.tacheEnDeplacement = t;
+    }
+
+    // Appelé quand on lache la tâche dans une colonne
+    public void finaliserDeplacement(String nouvelEtat) {
+        if (tacheEnDeplacement != null) {
+            modele.deplacerTache(tacheEnDeplacement, nouvelEtat);
+            tacheEnDeplacement = null; // Reset
+        }
+    }
 }
