@@ -21,4 +21,5 @@ public class Controller {
     public static void supprimerTache(Tache t) {
         TacheManager.getInstance().supprimerTache(t);
     }
+
 }

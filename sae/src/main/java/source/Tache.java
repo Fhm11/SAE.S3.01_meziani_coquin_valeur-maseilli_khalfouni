@@ -9,6 +9,7 @@ public abstract class Tache {
 
     private String titre;
     private String description;
+    private String etat = "afaire";
 
     /**
      * Constructeur créant une tâche
@@ -78,4 +79,12 @@ public abstract class Tache {
      * @return true si la tâche est composite, false si elle est simple
      */
     public abstract boolean estComposite();
+
+    public String getEtat() {
+        return etat;
+    }
+
+    public void setEtat(String nouvelEtat) {
+        this.etat = nouvelEtat;
+    }
 }
