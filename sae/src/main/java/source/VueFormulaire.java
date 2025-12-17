@@ -9,9 +9,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class VueFormulaire{
+public class VueFormulaire {
 
-    public static void afficherFormulaireCreation() {
+    // MODIFIÉ: Prend le contrôleur en paramètre (pas statique dans le contrôleur)
+    public static void afficherFormulaireCreation(Controller controleur) {
         Stage fenetre = new Stage();
         VBox root = new VBox(10);
         root.setPadding(new Insets(10));
@@ -19,12 +20,12 @@ public class VueFormulaire{
         TextField txtDesc = new TextField();
         CheckBox chkComposite = new CheckBox("Peut avoir des sous-tâches");
         Button btnSave = new Button("Sauvegarder");
+
         btnSave.setOnAction(e -> {
             try {
                 String titre = txtTitre.getText();
                 String description = txtDesc.getText();
-                Controller.creerTache(titre, description, chkComposite.isSelected());
-
+                controleur.creerTache(titre, description, chkComposite.isSelected());
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
                 System.err.println(ex.getMessage());
@@ -41,8 +42,7 @@ public class VueFormulaire{
         fenetre.show();
     }
 
-
-    public static void afficherFormulaireModification(Tache t) {
+    public static void afficherFormulaireModification(Tache t, Controller controleur) {
         Stage fenetre = new Stage();
         VBox root = new VBox(10);
         root.setPadding(new Insets(10));
@@ -50,14 +50,16 @@ public class VueFormulaire{
         TextField txtTitre = new TextField(t.getTitre());
         TextField txtDesc = new TextField(t.getDescription());
         Button btnSave = new Button("Sauvegarder");
+
         btnSave.setOnAction(e -> {
             try {
-                Controller.modifierTache(t, txtTitre.getText(), txtDesc.getText());
+                controleur.modifierTache(t, txtTitre.getText(), txtDesc.getText());
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
                 System.err.println(ex.getMessage());
             }
         });
+
         root.getChildren().addAll(
                 new Label("Titre :"), txtTitre,
                 new Label("Description :"), txtDesc,
@@ -68,21 +70,23 @@ public class VueFormulaire{
         fenetre.show();
     }
 
-    public static void afficherFormulaireSousTache(Tache parent) {
+    public static void afficherFormulaireSousTache(Tache parent, Controller controleur) {
         Stage fenetre = new Stage();
         VBox root = new VBox(10);
         root.setPadding(new Insets(10));
         TextField txtTitre = new TextField();
         TextField txtDesc = new TextField();
         Button btnSave = new Button("Ajouter");
+
         btnSave.setOnAction(e -> {
             try {
-                Controller.ajouterSousTache(parent, txtTitre.getText(), txtDesc.getText());
+                controleur.ajouterSousTache(parent, txtTitre.getText(), txtDesc.getText());
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
                 System.err.println(ex.getMessage());
             }
         });
+
         root.getChildren().addAll(
                 new Label("Ajouter sous-tâche à : " + parent.getTitre()),
                 new Label("Titre :"), txtTitre,

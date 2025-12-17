@@ -5,43 +5,52 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.geometry.Insets;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import java.util.ArrayList;
+import java.util.List;
 
-public class  VueBureau implements Observateur {
+public class VueBureau implements Observateur {
     private VBox root;
+    private TacheManager modele;
 
     private VBox colonneAFaire;
     private VBox colonneEnCours;
     private VBox colonneTermine;
 
+    // Stocker les composants pour configuration par Main
+    private List<Button> boutonsInteractifs = new ArrayList<>();
+    private List<VBox> cartesTaches = new ArrayList<>();
 
-    public VueBureau() {
+    public VueBureau(TacheManager modele) {
+        this.modele = modele;
         root = new VBox(10);
         root.setPadding(new Insets(10));
 
-        colonneAFaire = creerColonne("afaire");
-        colonneEnCours = creerColonne("encours");
-        colonneTermine = creerColonne("terminée");
+        colonneAFaire = creerColonne("À faire");
+        colonneEnCours = creerColonne("En cours");
+        colonneTermine = creerColonne("Terminée");
 
         HBox conteneurColonnes = new HBox(15);
         conteneurColonnes.getChildren().addAll(colonneAFaire, colonneEnCours, colonneTermine);
-
-        Button btnCreer = new Button("Nouvelle Tâche");
-        btnCreer.setStyle("-fx-font-size: 14px; -fx-base: #4CAF50;");
-        btnCreer.setOnAction(e -> VueFormulaire.afficherFormulaireCreation());
 
         HBox.setHgrow(colonneAFaire, Priority.ALWAYS);
         HBox.setHgrow(colonneEnCours, Priority.ALWAYS);
         HBox.setHgrow(colonneTermine, Priority.ALWAYS);
         VBox.setVgrow(conteneurColonnes, Priority.ALWAYS);
 
-        root.getChildren().addAll(btnCreer, conteneurColonnes);
+        root.getChildren().addAll(conteneurColonnes);
     }
 
     public VBox getRoot() {
         return root;
+    }
+
+    // Getters pour que Main configure les handlers
+    public List<Button> getBoutonsInteractifs() {
+        return boutonsInteractifs;
+    }
+
+    public List<VBox> getCartesTaches() {
+        return cartesTaches;
     }
 
     @Override
@@ -50,10 +59,14 @@ public class  VueBureau implements Observateur {
         nettoyerColonne(colonneEnCours);
         nettoyerColonne(colonneTermine);
 
-        for (Tache t : TacheManager.getInstance().getTaches()) {
-            VBox carte = creerAffichageTache(t);
-            String etat = t.getEtat();
+        boutonsInteractifs.clear();
+        cartesTaches.clear();
 
+        for (Tache t : modele.getTaches()) {
+            VBox carte = creerAffichageTache(t);
+            cartesTaches.add(carte);
+
+            String etat = t.getEtat();
             if ("afaire".equals(etat)) {
                 colonneAFaire.getChildren().add(carte);
             } else if ("encours".equals(etat)) {
@@ -70,7 +83,6 @@ public class  VueBureau implements Observateur {
         }
     }
 
-
     private VBox creerAffichageTache(Tache t) {
         VBox conteneur = new VBox(5);
         conteneur.setPadding(new Insets(10));
@@ -83,24 +95,22 @@ public class  VueBureau implements Observateur {
         labelDesc.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px;");
         labelDesc.setWrapText(true);
 
-        conteneur.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
-                VueFormulaire.afficherFormulaireModification(t);
-            }
-        });
+        // Stocker la tâche pour le double-clic
+        conteneur.setUserData(t);
 
         HBox boutons = new HBox(5);
         boutons.setAlignment(Pos.CENTER_RIGHT);
 
         if (t.estComposite()) {
             Button btnAjouterSous = new Button("+ Sous-tâche");
-            btnAjouterSous.setOnAction(e ->
-                    VueFormulaire.afficherFormulaireSousTache(t));
+            btnAjouterSous.setUserData(t);
+            boutonsInteractifs.add(btnAjouterSous);
             boutons.getChildren().add(btnAjouterSous);
         }
 
         Button btnSupprimer = new Button("Supprimer");
-        btnSupprimer.setOnAction(e -> Controller.supprimerTache(t));
+        btnSupprimer.setUserData(t);
+        boutonsInteractifs.add(btnSupprimer);
         boutons.getChildren().add(btnSupprimer);
 
         conteneur.getChildren().addAll(labelTitre, labelDesc, boutons);
@@ -121,6 +131,7 @@ public class  VueBureau implements Observateur {
                 conteneur.getChildren().add(boxSousTache);
             }
         }
+
         return conteneur;
     }
 
@@ -129,7 +140,7 @@ public class  VueBureau implements Observateur {
         col.setPadding(new Insets(10));
         col.setStyle("-fx-border-color: lightgray; -fx-border-width: 1; -fx-background-color: #f4f4f4;");
         Label lblTitre = new Label(titre);
-        lblTitre.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        lblTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
         col.getChildren().add(lblTitre);
         return col;
     }
