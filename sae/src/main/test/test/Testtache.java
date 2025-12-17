@@ -12,7 +12,7 @@ import source.Tache;
 import source.TacheFactory;
 import source.TacheManager;
 
-class TestTache {
+class Testtache {
 
     private TacheManager manager;
 
