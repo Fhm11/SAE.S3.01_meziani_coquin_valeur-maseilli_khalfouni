@@ -1,0 +1,13 @@
+Les fonctionnalités à développer seront :
+
+- modifier une tâche
+- supprimer une tâche
+- créer des sous-tâches
+- ajouter les colonnes
+
+Rôles : 
+
+Fahim fera la 4ème fonctionnalité
+Arnaud fera la 1er
+Fady fera la 2ème
+Marius fera la 3ème
