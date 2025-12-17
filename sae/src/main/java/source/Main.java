@@ -14,7 +14,7 @@ public class Main extends Application {
 
         Scene scene = new Scene(vue.getRoot(), 500, 600);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Gestionnaire de Tâches MVC Pur");
+        primaryStage.setTitle("Trello");
         primaryStage.show();
 
         // initialiser l'affichage
