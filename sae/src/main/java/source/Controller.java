@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 public class Controller implements EventHandler<ActionEvent> {
     private TacheManager modele;
 
-    // CONSTRUCTEUR avec modèle (comme dans le cours)
     public Controller(TacheManager modele) {
         this.modele = modele;
     }
@@ -30,9 +29,6 @@ public class Controller implements EventHandler<ActionEvent> {
                 if ("Supprimer".equals(btn.getText())) {
                     modele.supprimerTache(t);
                 } else if ("+ Sous-tâche".equals(btn.getText())) {
-                    // Le contrôleur décide d'ouvrir le formulaire
-                    // MAIS pour rester simple, on va appeler VueFormulaire
-                    // C'est acceptable car le contrôleur gère la navigation
                     VueFormulaire.afficherFormulaireSousTache(t, this);
                 }
             }

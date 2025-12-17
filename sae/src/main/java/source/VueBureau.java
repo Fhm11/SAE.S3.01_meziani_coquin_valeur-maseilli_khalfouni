@@ -95,7 +95,6 @@ public class VueBureau implements Observateur {
         labelDesc.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px;");
         labelDesc.setWrapText(true);
 
-        // Stocker la tâche pour le double-clic
         conteneur.setUserData(t);
 
         HBox boutons = new HBox(5);
