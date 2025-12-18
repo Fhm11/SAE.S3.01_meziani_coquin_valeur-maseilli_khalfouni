@@ -1,5 +1,6 @@
 package source;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
  * Classe représentant une tâche simple.
  * Une tâche simple ne peut pas contenir de sous-tâches.
  */
-public class TacheSimple extends Tache {
+public class TacheSimple extends Tache implements Serializable {
 
     /**
      * Constructeur créant une tâche simple.

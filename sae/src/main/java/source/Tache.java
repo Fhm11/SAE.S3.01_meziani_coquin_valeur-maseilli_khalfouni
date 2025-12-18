@@ -1,11 +1,12 @@
 package source;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Classe abstraite qui gère les tâches
  */
-public abstract class Tache {
+public abstract class Tache implements Serializable {
 
     private String titre;
     private String description;

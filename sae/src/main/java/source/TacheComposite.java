@@ -1,5 +1,6 @@
 package source;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -8,7 +9,7 @@ import java.util.ArrayList;
  * Une tâche composite peut contenir une liste de sous-tâches (TacheSimple ou TacheComposite).
  * Cette classe correspond au nœud composite dans la structure d'arbre.
  */
-public class TacheComposite extends Tache {
+public class TacheComposite extends Tache implements Serializable {
 
     private List<Tache> sousTaches;
 
