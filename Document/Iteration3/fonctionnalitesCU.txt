@@ -1,0 +1,14 @@
+Les fonctionnalités à développer seront :
+
+- le drag and drop
+- la sérialisation
+- la restructuration de MVC
+- visualiser la description
+- afficher les tâches dans les colonnes
+
+Rôles : 
+
+Arnaud fera la 4ème fonctionnalité
+Marius fera la 2ème et 3ème fonctionnalités
+Fahim fera la 1er fonctionnalité
+Fady fera la 5ème fonctionnalité
