@@ -12,6 +12,10 @@ public class Controller implements EventHandler<ActionEvent> {
         this.modele = modele;
     }
 
+    /**
+     * Méthode pour gérer les évènements
+     * @param event les évènements
+     */
     @Override
     public void handle(ActionEvent event) {
         Object source = event.getSource();
@@ -32,7 +36,12 @@ public class Controller implements EventHandler<ActionEvent> {
         }
     }
 
-    // Méthodes pour VueFormulaire
+    /**
+     * Méthodes pour vueFormulaire qui créé une tache
+     * @param titre le titre
+     * @param description la descrption
+     * @param estComposite true si elle peut avoir une sous-tâche, false sinon
+     */
     public void creerTache(String titre, String description, boolean estComposite) {
         if (estComposite) {
             modele.creerTacheComposite(titre, description);
@@ -41,20 +50,40 @@ public class Controller implements EventHandler<ActionEvent> {
         }
     }
 
+    /**
+     * Méthode pour modifier une tâche
+     * @param t la tâche à modifier
+     * @param titre le titre modifié
+     * @param description la description modifié
+     */
     public void modifierTache(Tache t, String titre, String description) {
         modele.modifierTache(t, titre, description);
     }
 
+    /**
+     * Méthode pour ajouter une tâche
+     * à une tâche existante
+     * @param parent la tâche parente
+     * @param titre le titre de la sous-tâche
+     * @param description la description de la sous-tâche
+     */
     public void ajouterSousTache(Tache parent, String titre, String description) {
         modele.ajouterSousTache(parent, titre, description);
     }
 
-    // Appelé quand le drag commence
+    /**
+     * Méthode appelée quand on clique sur une tâche
+     * pour la déplacée
+     * @param t la tâche
+     */
     public void debuterDeplacement(Tache t) {
         this.tacheEnDeplacement = t;
     }
 
-    // Appelé quand on lache la tâche dans une colonne
+    /**
+     * Appelé quand on lache la tâche dans une colonne
+      */
+
     public void finaliserDeplacement(String nouvelEtat) {
         if (tacheEnDeplacement != null) {
             modele.deplacerTache(tacheEnDeplacement, nouvelEtat);

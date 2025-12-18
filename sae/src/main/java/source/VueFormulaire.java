@@ -11,6 +11,10 @@ import javafx.stage.Stage;
 
 public class VueFormulaire {
 
+    /**
+     * Méthode pour afficher le formulaire de création de tâche
+     * @param controleur le controller
+     */
     public static void afficherFormulaireCreation(Controller controleur) {
         Stage fenetre = new Stage();
         VBox root = new VBox(10);
@@ -41,6 +45,11 @@ public class VueFormulaire {
         fenetre.show();
     }
 
+    /**
+     * Méthode pour afficher le formulaire de modification de tâche
+     * @param t la tâche à modifiée
+     * @param controleur le controlleur
+     */
     public static void afficherFormulaireModification(Tache t, Controller controleur) {
         Stage fenetre = new Stage();
         VBox root = new VBox(10);
@@ -69,6 +78,11 @@ public class VueFormulaire {
         fenetre.show();
     }
 
+    /**
+     * Méthode pour la création de sous-tâche
+     * @param parent la tâche parente
+     * @param controleur le controller
+     */
     public static void afficherFormulaireSousTache(Tache parent, Controller controleur) {
         Stage fenetre = new Stage();
         VBox root = new VBox(10);

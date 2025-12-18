@@ -10,11 +10,18 @@ public class TacheManager implements Sujet {
     private ArrayList<Tache> listeTaches;
     private static final String FICHIER_SAUVEGARDE = "taches.sauvegarde";
 
+    /**
+     * Le constructeur pour créer le modele
+     */
     private TacheManager() {
         observateurs = new ArrayList<>();
         charger();
     }
 
+    /**
+     * Méthode pour retourner l'instance de Singleton
+     * @return l'instance
+     */
     public static synchronized TacheManager getInstance() {
         if (instance == null) {
             instance = new TacheManager();
@@ -22,7 +29,10 @@ public class TacheManager implements Sujet {
         return instance;
     }
 
-    // chargement automatique au démarrage
+    /**
+     * Méthode pour charger les données au démarrage
+     * de l'application
+     */
     private void charger() {
         File fichier = new File(FICHIER_SAUVEGARDE);
         if (fichier.exists()) {
@@ -39,7 +49,10 @@ public class TacheManager implements Sujet {
         }
     }
 
-    // sauvegarde automatique après chaque modification
+    /**
+     * Méthode pour sauvegarder les données à chaque modification
+     * de l'application
+     */
     private void sauvegarder() {
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(FICHIER_SAUVEGARDE))) {
@@ -49,6 +62,11 @@ public class TacheManager implements Sujet {
         }
     }
 
+    /**
+     * Méthode pour créer une tâche simple
+     * @param titre le titre
+     * @param description la description
+     */
     public void creerTacheSimple(String titre, String description) {
         if (titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("titre obligatoire");
@@ -59,6 +77,11 @@ public class TacheManager implements Sujet {
         sauvegarder();
     }
 
+    /**
+     * Méthode pour créer une tâche composite
+     * @param titre son titre
+     * @param description sa description
+     */
     public void creerTacheComposite(String titre, String description) {
         if (titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("titre obligatoire");
@@ -69,6 +92,12 @@ public class TacheManager implements Sujet {
         sauvegarder();
     }
 
+    /**
+     * Méthode pour modifier une tâche
+     * @param t la tâche à modifier
+     * @param titre son nouveau titre
+     * @param description sa nouvelle description
+     */
     public void modifierTache(Tache t, String titre, String description) {
         if (t == null || titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("Paramètres invalides");
@@ -79,6 +108,12 @@ public class TacheManager implements Sujet {
         sauvegarder();
     }
 
+    /**
+     * Méthode pour ajouter une sous-tâche
+     * @param parent la tâche parente
+     * @param titre son titre
+     * @param description sa description
+     */
     public void ajouterSousTache(Tache parent, String titre, String description) {
         if (parent == null || !parent.estComposite() ||
                 titre == null || titre.trim().isEmpty()) {
@@ -92,6 +127,10 @@ public class TacheManager implements Sujet {
         sauvegarder();
     }
 
+    /**
+     * Méthode poursupprimer une tâche
+     * @param t la tâche à supprimer
+     */
     public void supprimerTache(Tache t) {
         if (t == null) return;
 
@@ -113,6 +152,10 @@ public class TacheManager implements Sujet {
         }
     }
 
+    /**
+     * Méthode pour ajouter les observateurs
+     * @param o l'observateur à ajouter
+     */
     @Override
     public void ajouterObservateur(Observateur o) {
         if (o != null && !observateurs.contains(o)) {
@@ -120,11 +163,18 @@ public class TacheManager implements Sujet {
         }
     }
 
+    /**
+     * Méthodes pour supprimer les observateurs
+     * @param o l'observateur à supp
+     */
     @Override
     public void supprimerObservateur(Observateur o) {
         observateurs.remove(o);
     }
 
+    /**
+     * Méthodes pour notifier les observateurs
+     */
     @Override
     public void notifierObservateur() {
         for (Observateur o : observateurs) {
@@ -132,10 +182,19 @@ public class TacheManager implements Sujet {
         }
     }
 
+    /**
+     * Getter pour voir les tâches
+     * @return les tâches
+     */
     public ArrayList<Tache> getTaches() {
         return listeTaches;
     }
 
+    /**
+     * Méthode pour le drag and drop
+     * @param t la tâche à déplacer
+     * @param nouvelEtat la colonne ou la tâche est placée
+     */
     public void deplacerTache(Tache t, String nouvelEtat) {
         if (t != null && nouvelEtat != null) {
             t.setEtat(nouvelEtat);
