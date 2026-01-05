@@ -138,6 +138,7 @@ public class VueBureau implements Observateur {
         header.setAlignment(Pos.CENTER_LEFT);
         Label lblTitre = new Label(titre);
         lblTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        lblTitre.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(lblTitre, Priority.ALWAYS);
         Button btnSupCol = new Button("X");
         btnSupCol.setStyle("-fx-text-fill: white; -fx-background-color: #ff4444; -fx-font-size: 10px; -fx-font-weight: bold;");

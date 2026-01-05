@@ -39,12 +39,14 @@ public class Main extends Application {
             VueFormulaire.afficherFormulaireCreation(controleur);
         });
 
-        Button btnAjoutCol = new Button("ajoute");
+        Button btnAjoutCol = new Button("cree colonne");
         btnAjoutCol.setStyle("-fx-font-size: 14px;");
         btnAjoutCol.setOnAction(e -> {
             TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("nvx");
-            dialog.setHeaderText("Entrez le nom :");
+            dialog.setTitle("cree colonne");
+            dialog.setHeaderText(null);
+            dialog.setGraphic(null);
+            dialog.setContentText("Entrez le nom :");
             String nom = dialog.showAndWait().orElse(null);
             if (nom != null && !nom.trim().isEmpty()) {
                 controleur.ajouterColonne(nom);
