@@ -98,4 +98,17 @@ public class Controller implements EventHandler<ActionEvent> {
     public void supprimerColonne(String titre) {
         modele.supprimerColonne(titre);
     }
+
+    /**
+     * Méthode pour changer le jour d'une tâche (pour la vue liste)
+     * @param t la tâche à déplacer
+     * @param nouveauJour le nouveau jour ("Lundi", "Mardi", etc.)
+     */
+    public void changerJourTache(Tache t, String nouveauJour) {
+        if (t != null && nouveauJour != null) {
+            t.setJDebut(nouveauJour);
+            modele.notifierObservateur();
+        }
+    }
+
 }

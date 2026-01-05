@@ -1,15 +1,11 @@
 package source;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.TransferMode;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.util.Optional;
@@ -21,29 +17,75 @@ public class Main extends Application {
     // style quand on survole une colonne avec une tâche
     private final String STYLE_COLONNE_SURVOL = "-fx-border-color: #4CAF50; -fx-border-width: 2; -fx-background-color: #e8f5e9;";
 
+    private BorderPane rootPrincipal;
+    private VueBureau vueBureau;
+    private VueListe vueListe;
+    private Controller controleur;
+    private TacheManager modele;
+    private ComboBox<String> comboVue;
+
     @Override
     public void start(Stage primaryStage) {
-        TacheManager modele = TacheManager.getInstance();
+        modele = TacheManager.getInstance();
 
-        VueBureau vue = new VueBureau(modele);
+        // crée les vues
+        vueBureau = new VueBureau(modele);
+        vueListe = new VueListe(modele);
 
-        Controller controleur = new Controller(modele);
+        controleur = new Controller(modele);
 
-        modele.ajouterObservateur(vue);
-        HBox barreOutils = new HBox(10);
+        // enregistrer les observateurs
+        modele.ajouterObservateur(vueBureau);
+        modele.ajouterObservateur(vueListe);
 
+        // crée le conteneur principal avec BorderPane
+        rootPrincipal = new BorderPane();
+
+        // crée la barre d'outils en haut
+        HBox toolbar = creerToolbar();
+        rootPrincipal.setTop(toolbar);
+
+        // afficher la vue Bureau par défaut
+        rootPrincipal.setCenter(vueBureau.getRoot());
+
+        // configurer les handlers pour la vue initiale (Bureau)
+        configurerHandlersColonnes(vueBureau, controleur);
+        vueBureau.actualiser();
+        vueListe.actualiser();
+        configurerHandlersPourVueActive();
+
+        // observer pour reconfigurer les handlers quand la vue est actualisée
+        modele.ajouterObservateur(new Observateur() {
+            @Override
+            public void actualiser() {
+                reconfigurerHandlersPourVueActive();
+            }
+        });
+
+        Scene scene = new Scene(rootPrincipal, 1000, 700);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Trello - Gestion de Tâches");
+        primaryStage.show();
+    }
+
+    private HBox creerToolbar() {
+        HBox toolbar = new HBox(10);
+        toolbar.setPadding(new Insets(10));
+        toolbar.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #ddd; -fx-border-width: 0 0 1 0;");
+
+        // btn Nouvelle Tâche
         Button btnCreer = new Button("Nouvelle Tâche");
-        btnCreer.setStyle("-fx-font-size: 14px; -fx-base: #4CAF50;");
-
+        btnCreer.setStyle("-fx-font-size: 14px; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 8 15;");
         btnCreer.setOnAction(e -> {
             VueFormulaire.afficherFormulaireCreation(controleur);
         });
 
-        Button btnAjoutCol = new Button("cree colonne");
-        btnAjoutCol.setStyle("-fx-font-size: 14px;");
+        // btn Créer Colonne
+        Button btnAjoutCol = new Button("Créer Colonne");
+        btnAjoutCol.setStyle("-fx-font-size: 14px; -fx-padding: 8 15;");
         btnAjoutCol.setOnAction(e -> {
             TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("cree colonne");
+            dialog.setTitle("Créer Colonne");
             dialog.setHeaderText(null);
             dialog.setGraphic(null);
             dialog.setContentText("Entrez le nom :");
@@ -53,39 +95,84 @@ public class Main extends Application {
             }
         });
 
-        barreOutils.getChildren().addAll(btnCreer, btnAjoutCol);
+        // séparateur
+        Separator separator1 = new Separator();
+        separator1.setOrientation(javafx.geometry.Orientation.VERTICAL);
 
-        vue.getRoot().getChildren().add(0, barreOutils);
+        // sélecteur de vue
+        Label labelVue = new Label("Vue :");
+        labelVue.setStyle("-fx-font-weight: bold; -fx-padding: 0 5 0 0;");
 
-        modele.ajouterObservateur(new Observateur() {
-            @Override
-            public void actualiser() {
-                configurerHandlersColonnes(vue, controleur);
-                // reconfigurer les handlers quand la vue est actualisée
-                configurerHandlersCartes(vue, controleur);
-                configurerBoutonsSuppressionColonne(vue, controleur);
-            }
+        comboVue = new ComboBox<>();
+        comboVue.getItems().addAll("Vue Bureau", "Vue Liste par Jour");
+        comboVue.setValue("Vue Bureau");
+        comboVue.setStyle("-fx-font-size: 14px;");
+
+        comboVue.setOnAction(e -> {
+            basculerVue();
         });
-        vue.actualiser();
-        configurerHandlersColonnes(vue, controleur);
-        configurerHandlersCartes(vue, controleur);
-        configurerBoutonsSuppressionColonne(vue, controleur);
 
-        Scene scene = new Scene(vue.getRoot(), 800, 600);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Trello");
-        primaryStage.show();
+        // espaceur pour pousser les éléments à gauche
+        Pane espaceur = new Pane();
+        HBox.setHgrow(espaceur, Priority.ALWAYS);
+
+        toolbar.getChildren().addAll(btnCreer, btnAjoutCol, separator1, labelVue, comboVue, espaceur);
+        return toolbar;
+    }
+
+    private void basculerVue() {
+        String vueSelectionnee = comboVue.getValue();
+        switch (vueSelectionnee) {
+            case "Vue Liste par Jour":
+                rootPrincipal.setCenter(vueListe.getRoot());
+                configurerHandlersCartesListe(vueListe, controleur);
+                break;
+            case "Vue Bureau":
+            default:
+                rootPrincipal.setCenter(vueBureau.getRoot());
+                configurerHandlersColonnes(vueBureau, controleur);
+                configurerHandlersCartes(vueBureau, controleur);
+                configurerBoutonsSuppressionColonne(vueBureau, controleur);
+                break;
+        }
+    }
+
+    private void configurerHandlersPourVueActive() {
+        if (rootPrincipal.getCenter() == vueBureau.getRoot()) {
+            configurerHandlersColonnes(vueBureau, controleur);
+            configurerHandlersCartes(vueBureau, controleur);
+            configurerBoutonsSuppressionColonne(vueBureau, controleur);
+        } else if (rootPrincipal.getCenter() == vueListe.getRoot()) {
+            configurerHandlersCartesListe(vueListe, controleur);
+        }
+    }
+
+    private void reconfigurerHandlersPourVueActive() {
+        configurerHandlersPourVueActive();
+    }
+
+    private void configurerHandlersCartesListe(VueListe vue, Controller controleur) {
+        for (Button btn : vue.getBoutonsInteractifs()) {
+            btn.setOnAction(controleur);
+        }
+
+        for (VBox carte : vue.getCartesTaches()) {
+            carte.setOnMouseClicked(e -> {
+                if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
+                    Tache t = (Tache) carte.getUserData();
+                    VueFormulaire.afficherFormulaireModification(t, controleur);
+                }
+            });
+        }
     }
 
     private void setupColonneDrop(VBox colonne, String etatCible, Controller controleur) {
-        // accepter le drag si ça vient d'ailleurs
         colonne.setOnDragOver(event -> {
             if (event.getGestureSource() != colonne && event.getDragboard().hasString()) {
                 event.acceptTransferModes(TransferMode.MOVE);
             }
             event.consume();
         });
-        // changement visuel quand on entre
         colonne.setOnDragEntered(event -> {
             if (event.getGestureSource() != colonne && event.getDragboard().hasString()) {
                 colonne.setStyle(STYLE_COLONNE_SURVOL);
@@ -93,18 +180,15 @@ public class Main extends Application {
             event.consume();
         });
 
-        // restaurer le style quand on sort
         colonne.setOnDragExited(event -> {
             colonne.setStyle(STYLE_COLONNE);
             event.consume();
         });
 
-        // gérer le lâcher (Drop)
         colonne.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
             boolean success = false;
             if (db.hasString()) {
-                // le contrôleur a gardé la référence de la tâche
                 controleur.finaliserDeplacement(etatCible);
                 success = true;
             }
@@ -112,19 +196,19 @@ public class Main extends Application {
             event.consume();
         });
     }
+
     private void configurerHandlersColonnes(VueBureau vue, Controller controleur) {
         for (VBox colonneBox : vue.getColonnesGraphiques()) {
             String nomColonne = (String) colonneBox.getUserData();
             setupColonneDrop(colonneBox, nomColonne, controleur);
         }
     }
+
     private void configurerHandlersCartes(VueBureau vue, Controller controleur) {
-        // pour chaque bouton stocké par VueBureau
         for (Button btn : vue.getBoutonsInteractifs()) {
             btn.setOnAction(controleur);
         }
 
-        // Pour chaque  carte stockée par VueBureau
         for (VBox carte : vue.getCartesTaches()) {
             carte.setOnMouseClicked(e -> {
                 if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
@@ -135,14 +219,11 @@ public class Main extends Application {
             carte.setOnDragDetected(event -> {
                 Tache t = (Tache) carte.getUserData();
 
-                // informer le contrôleur de la tâche qu'on déplace
                 controleur.debuterDeplacement(t);
-                // démarrer le drag&drop
                 Dragboard db = carte.startDragAndDrop(TransferMode.MOVE);
 
-                // mettre un contenu (obligatoire pour que le d&d fonctionne)
                 ClipboardContent content = new ClipboardContent();
-                content.putString(t.getTitre()); // on met juste le titre comme info texte
+                content.putString(t.getTitre());
                 db.setContent(content);
 
                 event.consume();
