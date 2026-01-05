@@ -12,9 +12,9 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    // Style par défaut des colonnes (pour le rétablir après le survol)
+    // style par défaut des colonnes (pour le rétablir après le survol)
     private final String STYLE_COLONNE = "-fx-border-color: lightgray; -fx-border-width: 1; -fx-background-color: #f4f4f4;";
-    // Style quand on survole une colonne avec une tâche
+    // style quand on survole une colonne avec une tâche
     private final String STYLE_COLONNE_SURVOL = "-fx-border-color: #4CAF50; -fx-border-width: 2; -fx-background-color: #e8f5e9;";
 
     @Override
@@ -54,14 +54,14 @@ public class Main extends Application {
     }
 
     private void setupColonneDrop(VBox colonne, String etatCible, Controller controleur) {
-        // Accepter le Drag si ça vient d'ailleurs
+        // accepter le drag si ça vient d'ailleurs
         colonne.setOnDragOver(event -> {
             if (event.getGestureSource() != colonne && event.getDragboard().hasString()) {
                 event.acceptTransferModes(TransferMode.MOVE);
             }
             event.consume();
         });
-        // Changement visuel quand on entre
+        // changement visuel quand on entre
         colonne.setOnDragEntered(event -> {
             if (event.getGestureSource() != colonne && event.getDragboard().hasString()) {
                 colonne.setStyle(STYLE_COLONNE_SURVOL);
@@ -69,18 +69,18 @@ public class Main extends Application {
             event.consume();
         });
 
-        // Restaurer le style quand on sort
+        // restaurer le style quand on sort
         colonne.setOnDragExited(event -> {
             colonne.setStyle(STYLE_COLONNE);
             event.consume();
         });
 
-        // Gérer le lâcher (Drop)
+        // gérer le lâcher (Drop)
         colonne.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
             boolean success = false;
             if (db.hasString()) {
-                // Le contrôleur a gardé la référence de la tâche
+                // le contrôleur a gardé la référence de la tâche
                 controleur.finaliserDeplacement(etatCible);
                 success = true;
             }
@@ -94,10 +94,12 @@ public class Main extends Application {
         setupColonneDrop(vue.getColonneTermine(), "terminer", controleur);
     }
     private void configurerHandlersCartes(VueBureau vue, Controller controleur) {
+        // pour chaque bouton stocké par VueBureau
         for (Button btn : vue.getBoutonsInteractifs()) {
             btn.setOnAction(controleur);
         }
 
+        // Pour chaque  carte stockée par VueBureau
         for (VBox carte : vue.getCartesTaches()) {
             carte.setOnMouseClicked(e -> {
                 if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
@@ -108,15 +110,14 @@ public class Main extends Application {
             carte.setOnDragDetected(event -> {
                 Tache t = (Tache) carte.getUserData();
 
-                // Informer le contrôleur de la tâche qu'on déplace
+                // informer le contrôleur de la tâche qu'on déplace
                 controleur.debuterDeplacement(t);
-
-                // Démarrer le Drag and Drop
+                // démarrer le drag&drop
                 Dragboard db = carte.startDragAndDrop(TransferMode.MOVE);
 
-                // Mettre un contenu (obligatoire pour que le DnD fonctionne)
+                // mettre un contenu (obligatoire pour que le d&d fonctionne)
                 ClipboardContent content = new ClipboardContent();
-                content.putString(t.getTitre()); // On met juste le titre comme info texte
+                content.putString(t.getTitre()); // on met juste le titre comme info texte
                 db.setContent(content);
 
                 event.consume();

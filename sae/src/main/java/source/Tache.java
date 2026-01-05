@@ -40,7 +40,7 @@ public abstract class Tache implements Serializable {
 
     public void setTitre(String titre) {
         if (titre == null || titre.trim().isEmpty()) {
-            throw new IllegalArgumentException("titre obliger");
+            throw new IllegalArgumentException("titre obligé");
         }
         this.titre = titre;
     }
