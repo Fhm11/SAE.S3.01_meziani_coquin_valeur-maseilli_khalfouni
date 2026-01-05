@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    // style par défaut des colonnes (pour le rétablir après le survol)
+    // style par défaut des colonnes 
     private final String STYLE_COLONNE = "-fx-border-color: lightgray; -fx-border-width: 1; -fx-background-color: #f4f4f4;";
     // style quand on survole une colonne avec une tâche
     private final String STYLE_COLONNE_SURVOL = "-fx-border-color: #4CAF50; -fx-border-width: 2; -fx-background-color: #e8f5e9;";
