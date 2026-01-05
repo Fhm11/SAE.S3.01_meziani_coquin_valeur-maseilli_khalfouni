@@ -127,13 +127,17 @@ public class TacheManager implements Sujet {
      * @param titre son titre
      * @param description sa description
      */
-    public void ajouterSousTache(Tache parent, String titre, String description, String debut, String fin) {
+    public void ajouterSousTache(Tache parent, String titre, String description, boolean estComposite, String debut, String fin) {
         if (parent == null || !parent.estComposite() ||
                 titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("Impossible d'ajouter une sous-tâche");
         }
-
-        Tache sousTache = TacheFactory.creerTacheSimple(titre, description, debut, fin);
+        Tache sousTache;
+        if (estComposite) {
+            sousTache = TacheFactory.creerTacheComposite(titre, description, debut, fin);
+        } else {
+            sousTache = TacheFactory.creerTacheSimple(titre, description, debut, fin);
+        }
         TacheComposite composite = (TacheComposite) parent;
         composite.ajouterSousTache(sousTache);
         notifierObservateur();
@@ -163,6 +167,21 @@ public class TacheManager implements Sujet {
                 }
             }
         }
+    }
+    private boolean supprimersoustache(Tache parent, Tache aSupprimer) {
+        if (!parent.estComposite()) return false;
+        TacheComposite composite = (TacheComposite) parent;
+        if (composite.retirerSousTache(aSupprimer)) {
+            return true;
+        }
+        for (Tache enfant : parent.getSousTaches()) {
+            if (enfant.estComposite()) {
+                if (supprimersoustache(enfant, aSupprimer)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

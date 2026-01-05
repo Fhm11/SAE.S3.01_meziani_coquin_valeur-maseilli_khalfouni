@@ -109,6 +109,10 @@ public class VueBureau implements Observateur {
         conteneur.getChildren().addAll(labelTitre, labelDesc, boutons);
 
         if (t.estComposite()) {
+            afficherSousTachesRecursif(t, conteneur);
+        }
+
+        if (t.estComposite()) {
             for(Tache sub : t.getSousTaches()) {
                 VBox boxSousTache = new VBox(2);
                 boxSousTache.setPadding(new Insets(0, 0, 0, 10));
@@ -147,5 +151,36 @@ public class VueBureau implements Observateur {
         header.getChildren().addAll(lblTitre, btnSupCol);
         col.getChildren().add(header);
         return col;
+    }
+
+    private void afficherSousTachesRecursif(Tache parent, VBox conteneurParent) {
+        if (!parent.estComposite()) return;
+        for (Tache sub : parent.getSousTaches()) {
+            VBox boxSousTache = new VBox(2);
+            boxSousTache.setPadding(new Insets(2, 0, 2, 20));
+            boxSousTache.setStyle("-fx-border-color: #eeeeee; -fx-border-width: 0 0 0 2;");
+            HBox ligne = new HBox(5);
+            ligne.setAlignment(Pos.CENTER_LEFT);
+            Label lTitre = new Label("• " + sub.getTitre());
+            lTitre.setStyle("-fx-text-fill: #333333; -fx-font-size: 11px; -fx-font-weight: bold;");
+            Button btnSup = new Button("X");
+            btnSup.setStyle("-fx-font-size: 9px; -fx-text-fill: red; -fx-font-weight: bold; -fx-background-color: transparent;");
+            btnSup.setText("Supprimer");
+            btnSup.setStyle("-fx-font-size: 9px; -fx-text-fill: red;");
+            btnSup.setUserData(sub);
+            boutonsInteractifs.add(btnSup);
+            ligne.getChildren().addAll(lTitre, btnSup);
+            if (sub.estComposite()) {
+                Button btnAdd = new Button("+");
+                btnAdd.setText("+ Sous-tâche");
+                btnAdd.setStyle("-fx-font-size: 9px; -fx-text-fill: blue;");
+                btnAdd.setUserData(sub);
+                boutonsInteractifs.add(btnAdd);
+                ligne.getChildren().add(btnAdd);
+            }
+            boxSousTache.getChildren().add(ligne);
+            afficherSousTachesRecursif(sub, boxSousTache);
+            conteneurParent.getChildren().add(boxSousTache);
+        }
     }
 }

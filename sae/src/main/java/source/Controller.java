@@ -67,8 +67,8 @@ public class Controller implements EventHandler<ActionEvent> {
      * @param titre le titre de la sous-tâche
      * @param description la description de la sous-tâche
      */
-    public void ajouterSousTache(Tache parent, String titre, String description, String debut, String fin) {
-        modele.ajouterSousTache(parent, titre, description, debut, fin);
+    public void ajouterSousTache(Tache parent, String titre, String description, boolean estComposite,String debut, String fin) {
+        modele.ajouterSousTache(parent, titre, description, estComposite, debut, fin);
     }
 
     /**

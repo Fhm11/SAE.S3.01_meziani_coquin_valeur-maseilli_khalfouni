@@ -111,7 +111,7 @@ public class VueFormulaire {
         comboDebut.setValue("Lundi");
         ComboBox<String> comboFin = new ComboBox<>(jours);
         comboFin.setValue("Lundi");
-
+        CheckBox chkComposite = new CheckBox("a sous tahce");
         Button btnSave = new Button("Ajouter");
 
         btnSave.setOnAction(e -> {
@@ -120,6 +120,7 @@ public class VueFormulaire {
                         parent,
                         txtTitre.getText(),
                         txtDesc.getText(),
+                        chkComposite.isSelected(),
                         comboDebut.getValue(),
                         comboFin.getValue()
                 );
@@ -135,9 +136,10 @@ public class VueFormulaire {
                 new Label("Description :"), txtDesc,
                 new Label("Jour Début :"), comboDebut,
                 new Label("Jour Fin :"), comboFin,
+                chkComposite,
                 btnSave
         );
-        fenetre.setScene(new Scene(root, 300, 250));
+        fenetre.setScene(new Scene(root, 300, 350));
         fenetre.setTitle("Ajouter une sous-tâche");
         fenetre.show();
     }

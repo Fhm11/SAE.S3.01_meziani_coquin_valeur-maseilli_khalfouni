@@ -69,9 +69,7 @@ public class VueListe implements Observateur {
                     // ajouter les sous-tâches si composite
                     if (tache.estComposite()) {
                         for (Tache sousTache : tache.getSousTaches()) {
-                            VBox carteSousTache = creerCarteSousTache(sousTache);
-                            cartesTaches.add(carteSousTache);
-                            sectionJour.getChildren().add(carteSousTache);
+                            afficherSousTachesRecursif(tache, sectionJour, 1);
                         }
                     }
                 }
@@ -162,9 +160,9 @@ public class VueListe implements Observateur {
         return carte;
     }
 
-    private VBox creerCarteSousTache(Tache sousTache) {
+    private VBox creerCarteSousTache(Tache sousTache, int niveau) {
         VBox carte = new VBox(3);
-        carte.setPadding(new Insets(5, 5, 5, 25)); // Indentation plus marquée
+        carte.setPadding(new Insets(5, 5, 5, 25*niveau)); // Indentation plus marquée
         carte.setStyle("-fx-background-color: #f8f8f8; " +
                 "-fx-border-radius: 3; -fx-background-radius: 3;");
 
@@ -177,7 +175,13 @@ public class VueListe implements Observateur {
         titre.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px; -fx-font-weight: bold;");
 
         ligneTitre.getChildren().addAll(point, titre);
-
+        if (sousTache.estComposite()) {
+            Button btnAdd = new Button("rajoute");
+            btnAdd.setStyle("-fx-font-size: 9px; -fx-text-fill: blue; -fx-padding: 2 5;");
+            btnAdd.setUserData(sousTache);
+            boutonsInteractifs.add(btnAdd);
+            ligneTitre.getChildren().add(btnAdd);
+        }
         Label description = new Label(sousTache.getDescription());
         description.setStyle("-fx-text-fill: #777777; -fx-font-size: 10px;");
         description.setWrapText(true);
@@ -216,6 +220,19 @@ public class VueListe implements Observateur {
             case "encours": return "En cours";
             case "terminer": return "Terminé";
             default: return etat;
+        }
+    }
+
+    private void afficherSousTachesRecursif(Tache parent, VBox conteneur, int niveau) {
+        if (!parent.estComposite()) return;
+
+        for (Tache sousTache : parent.getSousTaches()) {
+            VBox carteSousTache = creerCarteSousTache(sousTache, niveau);
+            cartesTaches.add(carteSousTache);
+            conteneur.getChildren().add(carteSousTache);
+            if (sousTache.estComposite()) {
+                afficherSousTachesRecursif(sousTache, conteneur, niveau + 1);
+            }
         }
     }
 }
