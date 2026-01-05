@@ -11,6 +11,8 @@ public abstract class Tache implements Serializable {
     private String titre;
     private String description;
     private String etat = "afaire";
+    private String jDebut;
+    private String jFin;
 
     /**
      * Constructeur créant une tâche
@@ -20,6 +22,8 @@ public abstract class Tache implements Serializable {
     public Tache(String titre, String description) {
         this.titre = titre;
         this.description = description;
+        this.jDebut = "Lundi";
+        this.jFin = "Lundi";
     }
 
     /**
@@ -38,6 +42,14 @@ public abstract class Tache implements Serializable {
         return description;
     }
 
+    public String getJDebut() {
+        return jDebut;
+    }
+
+    public String getJFin() {
+        return jFin;
+    }
+
     public void setTitre(String titre) {
         if (titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("titre obligé");
@@ -47,6 +59,14 @@ public abstract class Tache implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setJDebut(String jDebut) {
+        this.jDebut = jDebut;
+    }
+
+    public void setJFin(String jFin) {
+        this.jFin = jFin;
     }
 
     /**

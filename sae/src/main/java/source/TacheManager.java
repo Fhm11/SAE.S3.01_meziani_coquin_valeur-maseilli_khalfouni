@@ -67,11 +67,11 @@ public class TacheManager implements Sujet {
      * @param titre le titre
      * @param description la description
      */
-    public void creerTacheSimple(String titre, String description) {
+    public void creerTacheSimple(String titre, String description, String debut, String fin) {
         if (titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("titre obligatoire");
         }
-        Tache t = TacheFactory.creerTacheSimple(titre, description);
+        Tache t = TacheFactory.creerTacheSimple(titre, description, debut, fin);
         listeTaches.add(t);
         notifierObservateur();
         sauvegarder();
@@ -82,11 +82,11 @@ public class TacheManager implements Sujet {
      * @param titre son titre
      * @param description sa description
      */
-    public void creerTacheComposite(String titre, String description) {
+    public void creerTacheComposite(String titre, String description, String debut, String fin) {
         if (titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("titre obligatoire");
         }
-        Tache t = TacheFactory.creerTacheComposite(titre, description);
+        Tache t = TacheFactory.creerTacheComposite(titre, description, debut, fin);
         listeTaches.add(t);
         notifierObservateur();
         sauvegarder();
@@ -114,13 +114,13 @@ public class TacheManager implements Sujet {
      * @param titre son titre
      * @param description sa description
      */
-    public void ajouterSousTache(Tache parent, String titre, String description) {
+    public void ajouterSousTache(Tache parent, String titre, String description, String debut, String fin) {
         if (parent == null || !parent.estComposite() ||
                 titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("Impossible d'ajouter une sous-tâche");
         }
 
-        Tache sousTache = TacheFactory.creerTacheSimple(titre, description);
+        Tache sousTache = TacheFactory.creerTacheSimple(titre, description, debut, fin);
         TacheComposite composite = (TacheComposite) parent;
         composite.ajouterSousTache(sousTache);
         notifierObservateur();

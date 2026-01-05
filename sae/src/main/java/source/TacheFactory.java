@@ -13,11 +13,14 @@ public class TacheFactory {
      * @param description sa description
      * @return la tâche créée
      */
-    public static Tache creerTacheSimple(String titre, String description) {
+    public static Tache creerTacheSimple(String titre, String description, String debut, String fin) {
         if (titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("titre obligatoire");
         }
-        return new TacheSimple(titre, description);
+        Tache t = new TacheSimple(titre, description);
+        t.setJDebut(debut);
+        t.setJFin(fin);
+        return t;
     }
 
     /**
@@ -26,10 +29,13 @@ public class TacheFactory {
      * @param description sa description
      * @return la tâche créée
      */
-    public static Tache creerTacheComposite(String titre, String description) {
+    public static Tache creerTacheComposite(String titre, String description, String debut, String fin) {
         if (titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("titre obligatoire");
         }
-        return new TacheComposite(titre, description);
+        Tache t = new TacheComposite(titre, description);
+        t.setJDebut(debut);
+        t.setJFin(fin);
+        return t;
     }
 }

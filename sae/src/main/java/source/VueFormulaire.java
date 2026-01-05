@@ -2,10 +2,7 @@ package source;
 
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -21,14 +18,28 @@ public class VueFormulaire {
         root.setPadding(new Insets(10));
         TextField txtTitre = new TextField();
         TextField txtDesc = new TextField();
+
+        javafx.collections.ObservableList<String> jours =
+                javafx.collections.FXCollections.observableArrayList(
+                        "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"
+                );
+        ComboBox<String> comboDebut = new ComboBox<>(jours);
+        comboDebut.setValue("Lundi");
+        ComboBox<String> comboFin = new ComboBox<>(jours);
+        comboFin.setValue("Lundi");
+
         CheckBox chkComposite = new CheckBox("Peut avoir des sous-tâches");
         Button btnSave = new Button("Sauvegarder");
 
         btnSave.setOnAction(e -> {
             try {
-                String titre = txtTitre.getText();
-                String description = txtDesc.getText();
-                controleur.creerTache(titre, description, chkComposite.isSelected());
+                controleur.creerTache(
+                        txtTitre.getText(),
+                        txtDesc.getText(),
+                        chkComposite.isSelected(),
+                        comboDebut.getValue(),
+                        comboFin.getValue()
+                );
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
                 System.err.println(ex.getMessage());
@@ -38,9 +49,11 @@ public class VueFormulaire {
         root.getChildren().addAll(
                 new Label("Titre :"), txtTitre,
                 new Label("Description :"), txtDesc,
+                new Label("Jour Début :"), comboDebut,
+                new Label("Jour Fin :"), comboFin,
                 chkComposite, btnSave
         );
-        fenetre.setScene(new Scene(root, 300, 200));
+        fenetre.setScene(new Scene(root, 300, 450));
         fenetre.setTitle("Créer une tâche");
         fenetre.show();
     }
@@ -73,7 +86,7 @@ public class VueFormulaire {
                 new Label("Description :"), txtDesc,
                 btnSave
         );
-        fenetre.setScene(new Scene(root, 300, 200));
+        fenetre.setScene(new Scene(root, 300, 450));
         fenetre.setTitle("Modifier la tâche");
         fenetre.show();
     }
@@ -89,11 +102,27 @@ public class VueFormulaire {
         root.setPadding(new Insets(10));
         TextField txtTitre = new TextField();
         TextField txtDesc = new TextField();
+
+        javafx.collections.ObservableList<String> jours =
+                javafx.collections.FXCollections.observableArrayList(
+                        "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"
+                );
+        ComboBox<String> comboDebut = new ComboBox<>(jours);
+        comboDebut.setValue("Lundi");
+        ComboBox<String> comboFin = new ComboBox<>(jours);
+        comboFin.setValue("Lundi");
+
         Button btnSave = new Button("Ajouter");
 
         btnSave.setOnAction(e -> {
             try {
-                controleur.ajouterSousTache(parent, txtTitre.getText(), txtDesc.getText());
+                controleur.ajouterSousTache(
+                        parent,
+                        txtTitre.getText(),
+                        txtDesc.getText(),
+                        comboDebut.getValue(),
+                        comboFin.getValue()
+                );
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
                 System.err.println(ex.getMessage());
@@ -104,6 +133,8 @@ public class VueFormulaire {
                 new Label("Ajouter sous-tâche à : " + parent.getTitre()),
                 new Label("Titre :"), txtTitre,
                 new Label("Description :"), txtDesc,
+                new Label("Jour Début :"), comboDebut,
+                new Label("Jour Fin :"), comboFin,
                 btnSave
         );
         fenetre.setScene(new Scene(root, 300, 250));
