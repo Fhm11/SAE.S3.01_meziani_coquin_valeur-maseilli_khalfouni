@@ -20,6 +20,7 @@ public class Main extends Application {
     private BorderPane rootPrincipal;
     private VueBureau vueBureau;
     private VueListe vueListe;
+    private VueGantt vueGantt;
     private Controller controleur;
     private TacheManager modele;
     private ComboBox<String> comboVue;
@@ -31,12 +32,14 @@ public class Main extends Application {
         // crée les vues
         vueBureau = new VueBureau(modele);
         vueListe = new VueListe(modele);
+        vueGantt = new VueGantt(modele);
 
         controleur = new Controller(modele);
 
         // enregistrer les observateurs
         modele.ajouterObservateur(vueBureau);
         modele.ajouterObservateur(vueListe);
+        modele.ajouterObservateur(vueGantt);
 
         // crée le conteneur principal avec BorderPane
         rootPrincipal = new BorderPane();
@@ -104,7 +107,7 @@ public class Main extends Application {
         labelVue.setStyle("-fx-font-weight: bold; -fx-padding: 0 5 0 0;");
 
         comboVue = new ComboBox<>();
-        comboVue.getItems().addAll("Vue Bureau", "Vue Liste par Jour");
+        comboVue.getItems().addAll("Vue Bureau", "Vue Liste par Jour", "Vue Gantt");
         comboVue.setValue("Vue Bureau");
         comboVue.setStyle("-fx-font-size: 14px;");
 
@@ -126,6 +129,11 @@ public class Main extends Application {
             case "Vue Liste par Jour":
                 rootPrincipal.setCenter(vueListe.getRoot());
                 configurerHandlersCartesListe(vueListe, controleur);
+                break;
+
+            case  "Vue Gantt":
+                rootPrincipal.setCenter(vueGantt.getRoot());
+                vueGantt.actualiser();
                 break;
             case "Vue Bureau":
             default:
