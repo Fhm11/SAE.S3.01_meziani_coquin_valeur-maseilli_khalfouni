@@ -90,4 +90,12 @@ public class Controller implements EventHandler<ActionEvent> {
             tacheEnDeplacement = null; // Reset
         }
     }
+
+    public void ajouterColonne(String titre) {
+        modele.ajouterColonne(titre);
+    }
+
+    public void supprimerColonne(String titre) {
+        modele.supprimerColonne(titre);
+    }
 }

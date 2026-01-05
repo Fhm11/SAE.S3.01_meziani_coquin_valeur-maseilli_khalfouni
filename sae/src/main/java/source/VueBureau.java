@@ -12,9 +12,8 @@ public class VueBureau implements Observateur {
     private VBox root;
     private TacheManager modele;
 
-    private VBox colonneAFaire;
-    private VBox colonneEnCours;
-    private VBox colonneTermine;
+    private HBox conteneurColonnes;
+    private List<VBox> colonnesGraphiques = new ArrayList<>();
 
     private List<Button> boutonsInteractifs = new ArrayList<>();
     private List<VBox> cartesTaches = new ArrayList<>();
@@ -24,19 +23,17 @@ public class VueBureau implements Observateur {
         root = new VBox(10);
         root.setPadding(new Insets(10));
 
-        colonneAFaire = creerColonne("À faire");
-        colonneEnCours = creerColonne("En cours");
-        colonneTermine = creerColonne("Terminée");
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
 
-        HBox conteneurColonnes = new HBox(15);
-        conteneurColonnes.getChildren().addAll(colonneAFaire, colonneEnCours, colonneTermine);
+        conteneurColonnes = new HBox(15);
+        conteneurColonnes.setPadding(new Insets(10));
 
-        HBox.setHgrow(colonneAFaire, Priority.ALWAYS);
-        HBox.setHgrow(colonneEnCours, Priority.ALWAYS);
-        HBox.setHgrow(colonneTermine, Priority.ALWAYS);
-        VBox.setVgrow(conteneurColonnes, Priority.ALWAYS);
+        scrollPane.setContent(conteneurColonnes);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
-        root.getChildren().addAll(conteneurColonnes);
+        root.getChildren().addAll(scrollPane);
     }
 
     public VBox getRoot() {
@@ -51,37 +48,32 @@ public class VueBureau implements Observateur {
         return cartesTaches;
     }
 
-    public VBox getColonneAFaire() { return colonneAFaire; }
-    public VBox getColonneEnCours() { return colonneEnCours; }
-    public VBox getColonneTermine() { return colonneTermine; }
+    public List<VBox> getColonnesGraphiques() {
+        return colonnesGraphiques;
+    }
+
+    public HBox getConteneurColonnes() {
+        return conteneurColonnes;
+    }
 
     @Override
     public void actualiser() {
-        nettoyerColonne(colonneAFaire);
-        nettoyerColonne(colonneEnCours);
-        nettoyerColonne(colonneTermine);
-
+        conteneurColonnes.getChildren().clear();
+        colonnesGraphiques.clear();
         boutonsInteractifs.clear();
         cartesTaches.clear();
 
-        for (Tache t : modele.getTaches()) {
-            VBox carte = creerAffichageTache(t);
-            cartesTaches.add(carte);
-
-            String etat = t.getEtat();
-            if ("afaire".equals(etat)) {
-                colonneAFaire.getChildren().add(carte);
-            } else if ("encours".equals(etat)) {
-                colonneEnCours.getChildren().add(carte);
-            } else if ("terminer".equals(etat)) {
-                colonneTermine.getChildren().add(carte);
+        for (String nomColonne : modele.getColonnes()) {
+            VBox colBox = creerColonne(nomColonne);
+            colonnesGraphiques.add(colBox);
+            for (Tache t : modele.getTaches()) {
+                if (nomColonne.equals(t.getEtat())) {
+                    VBox carte = creerAffichageTache(t);
+                    cartesTaches.add(carte);
+                    colBox.getChildren().add(carte);
+                }
             }
-        }
-    }
-
-    private void nettoyerColonne(VBox col) {
-        if (col.getChildren().size() > 1) {
-            col.getChildren().remove(1, col.getChildren().size());
+            conteneurColonnes.getChildren().add(colBox);
         }
     }
 
@@ -89,7 +81,7 @@ public class VueBureau implements Observateur {
         VBox conteneur = new VBox(5);
         conteneur.setPadding(new Insets(10));
         conteneur.setStyle("-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1); -fx-background-radius: 5;");
-
+        conteneur.setUserData(t);
         Label labelTitre = new Label(t.getTitre());
         labelTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
 
@@ -139,10 +131,20 @@ public class VueBureau implements Observateur {
     private VBox creerColonne(String titre) {
         VBox col = new VBox(10);
         col.setPadding(new Insets(10));
+        col.setMinWidth(250);
         col.setStyle("-fx-border-color: lightgray; -fx-border-width: 1; -fx-background-color: #f4f4f4;");
+        col.setUserData(titre);
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
         Label lblTitre = new Label(titre);
         lblTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-        col.getChildren().add(lblTitre);
+        HBox.setHgrow(lblTitre, Priority.ALWAYS);
+        Button btnSupCol = new Button("X");
+        btnSupCol.setStyle("-fx-text-fill: white; -fx-background-color: #ff4444; -fx-font-size: 10px; -fx-font-weight: bold;");
+        btnSupCol.setUserData(titre);
+        boutonsInteractifs.add(btnSupCol);
+        header.getChildren().addAll(lblTitre, btnSupCol);
+        col.getChildren().add(header);
         return col;
     }
 }

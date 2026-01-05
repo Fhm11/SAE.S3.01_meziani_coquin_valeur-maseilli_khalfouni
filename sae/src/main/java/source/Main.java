@@ -3,16 +3,20 @@ package source;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Optional;
+
 public class Main extends Application {
 
-    // style par défaut des colonnes 
+    // style par défaut des colonnes
     private final String STYLE_COLONNE = "-fx-border-color: lightgray; -fx-border-width: 1; -fx-background-color: #f4f4f4;";
     // style quand on survole une colonne avec une tâche
     private final String STYLE_COLONNE_SURVOL = "-fx-border-color: #4CAF50; -fx-border-width: 2; -fx-background-color: #e8f5e9;";
@@ -26,6 +30,7 @@ public class Main extends Application {
         Controller controleur = new Controller(modele);
 
         modele.ajouterObservateur(vue);
+        HBox barreOutils = new HBox(10);
 
         Button btnCreer = new Button("Nouvelle Tâche");
         btnCreer.setStyle("-fx-font-size: 14px; -fx-base: #4CAF50;");
@@ -34,18 +39,35 @@ public class Main extends Application {
             VueFormulaire.afficherFormulaireCreation(controleur);
         });
 
-        vue.getRoot().getChildren().add(0, btnCreer);
+        Button btnAjoutCol = new Button("ajoute");
+        btnAjoutCol.setStyle("-fx-font-size: 14px;");
+        btnAjoutCol.setOnAction(e -> {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("nvx");
+            dialog.setHeaderText("Entrez le nom :");
+            String nom = dialog.showAndWait().orElse(null);
+            if (nom != null && !nom.trim().isEmpty()) {
+                controleur.ajouterColonne(nom);
+            }
+        });
+
+        barreOutils.getChildren().addAll(btnCreer, btnAjoutCol);
+
+        vue.getRoot().getChildren().add(0, barreOutils);
 
         modele.ajouterObservateur(new Observateur() {
             @Override
             public void actualiser() {
+                configurerHandlersColonnes(vue, controleur);
                 // reconfigurer les handlers quand la vue est actualisée
                 configurerHandlersCartes(vue, controleur);
+                configurerBoutonsSuppressionColonne(vue, controleur);
             }
         });
-        configurerHandlersColonnes(vue, controleur);
         vue.actualiser();
+        configurerHandlersColonnes(vue, controleur);
         configurerHandlersCartes(vue, controleur);
+        configurerBoutonsSuppressionColonne(vue, controleur);
 
         Scene scene = new Scene(vue.getRoot(), 800, 600);
         primaryStage.setScene(scene);
@@ -89,9 +111,10 @@ public class Main extends Application {
         });
     }
     private void configurerHandlersColonnes(VueBureau vue, Controller controleur) {
-        setupColonneDrop(vue.getColonneAFaire(), "afaire", controleur);
-        setupColonneDrop(vue.getColonneEnCours(), "encours", controleur);
-        setupColonneDrop(vue.getColonneTermine(), "terminer", controleur);
+        for (VBox colonneBox : vue.getColonnesGraphiques()) {
+            String nomColonne = (String) colonneBox.getUserData();
+            setupColonneDrop(colonneBox, nomColonne, controleur);
+        }
     }
     private void configurerHandlersCartes(VueBureau vue, Controller controleur) {
         // pour chaque bouton stocké par VueBureau
@@ -122,6 +145,16 @@ public class Main extends Application {
 
                 event.consume();
             });
+        }
+    }
+
+    private void configurerBoutonsSuppressionColonne(VueBureau vue, Controller controleur) {
+        for (Button btn : vue.getBoutonsInteractifs()) {
+            Object data = btn.getUserData();
+            if (data instanceof String) {
+                String nomColonne = (String) data;
+                btn.setOnAction(e -> controleur.supprimerColonne(nomColonne));
+            }
         }
     }
 

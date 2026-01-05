@@ -9,6 +9,8 @@ public class TacheManager implements Sujet {
     private ArrayList<Observateur> observateurs;
     private ArrayList<Tache> listeTaches;
     private static final String FICHIER_SAUVEGARDE = "taches.sauvegarde";
+    private static final String FICHIER_COLONNES = "colonnes.sauvegarde";
+    private ArrayList<String> colonnes;
 
     /**
      * Le constructeur pour créer le modele
@@ -16,6 +18,7 @@ public class TacheManager implements Sujet {
     private TacheManager() {
         observateurs = new ArrayList<>();
         charger();
+        chargerColonnes();
     }
 
     /**
@@ -27,6 +30,10 @@ public class TacheManager implements Sujet {
             instance = new TacheManager();
         }
         return instance;
+    }
+
+    public ArrayList<String> getColonnes() {
+        return colonnes;
     }
 
     /**
@@ -72,6 +79,9 @@ public class TacheManager implements Sujet {
             throw new IllegalArgumentException("titre obligatoire");
         }
         Tache t = TacheFactory.creerTacheSimple(titre, description, debut, fin);
+        if (!colonnes.isEmpty()) {
+            t.setEtat(colonnes.get(0));
+        }
         listeTaches.add(t);
         notifierObservateur();
         sauvegarder();
@@ -87,6 +97,9 @@ public class TacheManager implements Sujet {
             throw new IllegalArgumentException("titre obligatoire");
         }
         Tache t = TacheFactory.creerTacheComposite(titre, description, debut, fin);
+        if (!colonnes.isEmpty()) {
+            t.setEtat(colonnes.get(0));
+        }
         listeTaches.add(t);
         notifierObservateur();
         sauvegarder();
@@ -200,6 +213,56 @@ public class TacheManager implements Sujet {
             t.setEtat(nouvelEtat);
             notifierObservateur();
             sauvegarder(); 
+        }
+    }
+
+    public void ajouterColonne(String titre) {
+            colonnes.add(titre);
+            notifierObservateur();
+            sauvegarderColonnes();
+    }
+
+    public void supprimerColonne(String titre) {
+        if (colonnes.remove(titre)) {
+            ArrayList<Tache> aSupprimer = new ArrayList<>();
+            for (Tache t : listeTaches) {
+                if (t.getEtat().equals(titre)) {
+                    aSupprimer.add(t);
+                }
+            }
+            listeTaches.removeAll(aSupprimer);
+
+            notifierObservateur();
+            sauvegarderColonnes();
+            sauvegarder();
+        }
+    }
+
+    private void chargerColonnes() {
+        File fichier = new File(FICHIER_COLONNES);
+        if (fichier.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichier))) {
+                colonnes = (ArrayList<String>) ois.readObject();
+            } catch (Exception e) {
+                initColonnesDefaut();
+            }
+        } else {
+            initColonnesDefaut();
+        }
+    }
+
+    private void initColonnesDefaut() {
+        colonnes = new ArrayList<>();
+        colonnes.add("À faire");
+        colonnes.add("En cours");
+        colonnes.add("Terminée");
+    }
+
+    private void sauvegarderColonnes() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FICHIER_COLONNES))) {
+            oos.writeObject(colonnes);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
