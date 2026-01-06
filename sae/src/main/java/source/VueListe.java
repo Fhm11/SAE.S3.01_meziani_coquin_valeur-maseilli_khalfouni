@@ -143,7 +143,7 @@ public class VueListe implements Observateur {
 
         // utiliser le même texte que dans VueBureau
         if (tache.estComposite()) {
-            Button btnSousTache = new Button("+ Sous-tâche");
+            Button btnSousTache = new Button("+");
             btnSousTache.setUserData(tache);
             btnSousTache.setStyle("-fx-font-size: 11px; -fx-padding: 3 8;");
             boutonsInteractifs.add(btnSousTache);
@@ -163,7 +163,7 @@ public class VueListe implements Observateur {
     private VBox creerCarteSousTache(Tache sousTache, int niveau) {
         VBox carte = new VBox(3);
         carte.setUserData(sousTache);
-        carte.setPadding(new Insets(5, 5, 5, 25*niveau)); // Indentation plus marquée
+        carte.setPadding(new Insets(5, 5, 5, 25 * niveau)); // Indentation plus marquée
         carte.setStyle("-fx-background-color: #f8f8f8; " +
                 "-fx-border-radius: 3; -fx-background-radius: 3;");
 
@@ -217,15 +217,20 @@ public class VueListe implements Observateur {
 
     private String getEtatTexte(String etat) {
         switch (etat) {
-            case "afaire": return "À faire";
-            case "encours": return "En cours";
-            case "terminer": return "Terminé";
-            default: return etat;
+            case "afaire":
+                return "À faire";
+            case "encours":
+                return "En cours";
+            case "terminer":
+                return "Terminé";
+            default:
+                return etat;
         }
     }
 
     private void afficherSousTachesRecursif(Tache parent, VBox conteneur, int niveau) {
-        if (!parent.estComposite()) return;
+        if (!parent.estComposite())
+            return;
 
         for (Tache sousTache : parent.getSousTaches()) {
             VBox carteSousTache = creerCarteSousTache(sousTache, niveau);
