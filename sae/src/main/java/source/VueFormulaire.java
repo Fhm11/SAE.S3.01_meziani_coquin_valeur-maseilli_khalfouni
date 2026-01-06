@@ -111,7 +111,7 @@ public class VueFormulaire {
         comboDebut.setValue("Lundi");
         ComboBox<String> comboFin = new ComboBox<>(jours);
         comboFin.setValue("Lundi");
-        CheckBox chkComposite = new CheckBox("a sous tahce");
+        CheckBox chkComposite = new CheckBox("Ajouter une sous-tâche");
         Button btnSave = new Button("Ajouter");
 
         btnSave.setOnAction(e -> {
