@@ -159,6 +159,8 @@ public class VueBureau implements Observateur {
             VBox boxSousTache = new VBox(2);
             boxSousTache.setPadding(new Insets(2, 0, 2, 20));
             boxSousTache.setStyle("-fx-border-color: #eeeeee; -fx-border-width: 0 0 0 2;");
+            boxSousTache.setUserData(sub);
+            cartesTaches.add(boxSousTache);
             HBox ligne = new HBox(5);
             ligne.setAlignment(Pos.CENTER_LEFT);
             Label lTitre = new Label("• " + sub.getTitre());

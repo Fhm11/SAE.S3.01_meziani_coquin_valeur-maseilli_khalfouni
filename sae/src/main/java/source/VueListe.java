@@ -162,6 +162,7 @@ public class VueListe implements Observateur {
 
     private VBox creerCarteSousTache(Tache sousTache, int niveau) {
         VBox carte = new VBox(3);
+        carte.setUserData(sousTache);
         carte.setPadding(new Insets(5, 5, 5, 25*niveau)); // Indentation plus marquée
         carte.setStyle("-fx-background-color: #f8f8f8; " +
                 "-fx-border-radius: 3; -fx-background-radius: 3;");
