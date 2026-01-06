@@ -177,7 +177,7 @@ public class VueListe implements Observateur {
 
         ligneTitre.getChildren().addAll(point, titre);
         if (sousTache.estComposite()) {
-            Button btnAdd = new Button("rajoute");
+            Button btnAdd = new Button("+");
             btnAdd.setStyle("-fx-font-size: 9px; -fx-text-fill: blue; -fx-padding: 2 5;");
             btnAdd.setUserData(sousTache);
             boutonsInteractifs.add(btnAdd);
