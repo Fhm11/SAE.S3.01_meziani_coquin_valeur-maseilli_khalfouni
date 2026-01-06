@@ -114,24 +114,6 @@ public class VueBureau implements Observateur {
         if (t.estComposite()) {
             afficherSousTachesRecursif(t, conteneur);
         }
-
-        if (t.estComposite()) {
-            for(Tache sub : t.getSousTaches()) {
-                VBox boxSousTache = new VBox(2);
-                boxSousTache.setPadding(new Insets(0, 0, 0, 10));
-
-                Label lTitre = new Label(" > " + sub.getTitre());
-                lTitre.setStyle("-fx-text-fill: #333333; -fx-font-size: 10px; -fx-font-weight: bold;");
-
-                Label lDesc = new Label("   " + sub.getDescription());
-                lDesc.setStyle("-fx-text-fill: gray; -fx-font-size: 9px;");
-                lDesc.setWrapText(true);
-
-                boxSousTache.getChildren().addAll(lTitre, lDesc);
-                conteneur.getChildren().add(boxSousTache);
-            }
-        }
-
         return conteneur;
     }
 
