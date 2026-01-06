@@ -7,7 +7,7 @@ import source.TacheManager;
 import source.Controller;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,7 +25,7 @@ class TestTacheAvance {
 
     @Test
     void testSerializationSauvegarde() {
-        manager.creerTacheSimple("Tache Sauvegarde", "Description");
+        manager.creerTacheSimple("Tache Sauvegarde", "Description", "Lundi", "Lundi");
 
         File fichier = new File("taches.sauvegarde");
         assertTrue(fichier.exists());
@@ -33,7 +33,7 @@ class TestTacheAvance {
 
     @Test
     void testDeplacementTacheViaController() {
-        manager.creerTacheSimple("Tache Drag", "Desc");
+        manager.creerTacheSimple("Tache Drag", "Desc", "Lundi", "Lundi");
         Tache t = manager.getTaches().get(0);
         assertEquals("afaire", t.getEtat());
 
@@ -45,7 +45,7 @@ class TestTacheAvance {
 
     @Test
     void testDeplacementTacheDirectManager() {
-        manager.creerTacheSimple("Tache Manager", "Desc");
+        manager.creerTacheSimple("Tache Manager", "Desc", "Lundi", "Lundi");
         Tache t = manager.getTaches().get(0);
 
         manager.deplacerTache(t, "terminer");
@@ -55,7 +55,7 @@ class TestTacheAvance {
 
     @Test
     void testDeplacementNull() {
-        manager.creerTacheSimple("Tache", "Desc");
+        manager.creerTacheSimple("Tache", "Desc", "Lundi", "Lundi");
         Tache t = manager.getTaches().get(0);
 
         controller.debuterDeplacement(t);
@@ -67,7 +67,7 @@ class TestTacheAvance {
     @Test
     void testChargementDonnees() {
         manager.getTaches().clear();
-        manager.creerTacheSimple("Persistance", "Verif");
+        manager.creerTacheSimple("Persistance", "Verif", "Lundi", "Lundi");
 
         ArrayList<Tache> listeAvant = new ArrayList<>(manager.getTaches());
 
@@ -85,8 +85,78 @@ class TestTacheAvance {
 
     @Test
     void testEtatInitialNouvelleTache() {
-        controller.creerTache("Test Etat", "Desc", false);
+        controller.creerTache("Test Etat", "Desc", false, "Lundi", "Lundi");
         Tache t = manager.getTaches().get(0);
         assertEquals("afaire", t.getEtat());
+    }
+
+    @Test
+    void testCreerTacheAvecJours() {
+        controller.creerTache("Tache Gantt", "Description", false, "Mardi", "Vendredi");
+        Tache t = manager.getTaches().get(0);
+
+        assertEquals("Mardi", t.getJDebut());
+        assertEquals("Vendredi", t.getJFin());
+    }
+
+    @Test
+    void testAjouterSousTacheAvecJours() {
+        manager.creerTacheComposite("Parent", "Desc", "Lundi", "Dimanche");
+        Tache parent = manager.getTaches().get(0);
+
+        controller.ajouterSousTache(parent, "Sous-tache", "Desc", false, "Mercredi", "Jeudi");
+
+        Tache enfant = parent.getSousTaches().get(0);
+        assertEquals("Mercredi", enfant.getJDebut());
+        assertEquals("Jeudi", enfant.getJFin());
+    }
+
+    @Test
+    void testGestionColonnesDynamiques() {
+        int nbInitial = manager.getColonnes().size();
+
+        controller.ajouterColonne("En attente");
+        assertTrue(manager.getColonnes().contains("En attente"));
+        assertEquals(nbInitial + 1, manager.getColonnes().size());
+
+        controller.supprimerColonne("En attente");
+        assertFalse(manager.getColonnes().contains("En attente"));
+        assertEquals(nbInitial, manager.getColonnes().size());
+    }
+
+    @Test
+    void testChangerJourTache() {
+        manager.creerTacheSimple("Tache Temp", "Desc", "Lundi", "Lundi");
+        Tache t = manager.getTaches().get(0);
+
+        controller.changerJourTache(t, "Samedi");
+        assertEquals("Samedi", t.getJDebut());
+    }
+
+    @Test
+    void testCalculDureeGantt() {
+        List<String> joursRef = Arrays.asList("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche");
+
+        String debut = "Lundi";
+        String fin = "Mercredi";
+
+        int colDep = joursRef.indexOf(debut) + 1;
+        int colFin = joursRef.indexOf(fin) + 1;
+        int duree = Math.max(1, colFin - colDep + 1);
+
+        assertEquals(1, colDep);
+        assertEquals(3, duree);
+    }
+
+    @Test
+    void testSuppressionColonneNettoieTaches() {
+        controller.ajouterColonne("jsp");
+        manager.creerTacheSimple("titre", "Desc", "Lundi", "Mardi");
+        Tache t = manager.getTaches().get(0);
+        t.setEtat("jsp");
+
+        controller.supprimerColonne("jsp");
+
+        assertFalse(manager.getTaches().contains(t));
     }
 }
