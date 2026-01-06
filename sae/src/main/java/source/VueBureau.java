@@ -89,6 +89,9 @@ public class VueBureau implements Observateur {
         labelDesc.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px;");
         labelDesc.setWrapText(true);
 
+        Label labelDate = new Label("dta deb : " + t.getJDebut());
+        labelDate.setStyle("-fx-text-fill: #888888; -fx-font-size: 10px; -fx-font-style: italic;");
+
         conteneur.setUserData(t);
 
         HBox boutons = new HBox(5);
@@ -106,7 +109,7 @@ public class VueBureau implements Observateur {
         boutonsInteractifs.add(btnSupprimer);
         boutons.getChildren().add(btnSupprimer);
 
-        conteneur.getChildren().addAll(labelTitre, labelDesc, boutons);
+        conteneur.getChildren().addAll(labelTitre, labelDesc, boutons,labelDate);
 
         if (t.estComposite()) {
             afficherSousTachesRecursif(t, conteneur);
@@ -165,13 +168,15 @@ public class VueBureau implements Observateur {
             ligne.setAlignment(Pos.CENTER_LEFT);
             Label lTitre = new Label("• " + sub.getTitre());
             lTitre.setStyle("-fx-text-fill: #333333; -fx-font-size: 11px; -fx-font-weight: bold;");
+            Label lDate = new Label("dta deb" + sub.getJDebut() );
+            lDate.setStyle("-fx-text-fill: #999999; -fx-font-size: 10px;");
             Button btnSup = new Button("X");
             btnSup.setStyle("-fx-font-size: 9px; -fx-text-fill: red; -fx-font-weight: bold; -fx-background-color: transparent;");
             btnSup.setText("Supprimer");
             btnSup.setStyle("-fx-font-size: 9px; -fx-text-fill: red;");
             btnSup.setUserData(sub);
             boutonsInteractifs.add(btnSup);
-            ligne.getChildren().addAll(lTitre, btnSup);
+            ligne.getChildren().addAll(lTitre, btnSup,lDate);
             if (sub.estComposite()) {
                 Button btnAdd = new Button("+");
                 btnAdd.setText("+ Sous-tâche");
