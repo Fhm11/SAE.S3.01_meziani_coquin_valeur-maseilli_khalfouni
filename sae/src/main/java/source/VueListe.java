@@ -194,9 +194,9 @@ public class VueListe implements Observateur {
 
     private String getStyleTitreParEtat(String etat) {
         switch (etat) {
-            case "encours":
+            case "En cours":
                 return "-fx-font-weight: bold; -fx-text-fill: #e67e22; -fx-font-size: 13px;";
-            case "terminer":
+            case "Terminée":
                 return "-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 13px; " +
                         "-fx-strikethrough: true;";
             default: // afaire
@@ -206,9 +206,9 @@ public class VueListe implements Observateur {
 
     private String getStyleEtat(String etat) {
         switch (etat) {
-            case "encours":
+            case "En cours":
                 return "-fx-font-size: 10px; -fx-text-fill: #e67e22; -fx-font-weight: bold;";
-            case "terminer":
+            case "Terminée":
                 return "-fx-font-size: 10px; -fx-text-fill: #27ae60; -fx-font-weight: bold;";
             default: // afaire
                 return "-fx-font-size: 10px; -fx-text-fill: #7f8c8d;";

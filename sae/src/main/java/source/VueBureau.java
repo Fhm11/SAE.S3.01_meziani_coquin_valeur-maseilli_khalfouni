@@ -98,7 +98,7 @@ public class VueBureau implements Observateur {
         boutons.setAlignment(Pos.CENTER_RIGHT);
 
         if (t.estComposite()) {
-            Button btnAjouterSous = new Button("+ Sous-tâche");
+            Button btnAjouterSous = new Button("+");
             btnAjouterSous.setUserData(t);
             boutonsInteractifs.add(btnAjouterSous);
             boutons.getChildren().add(btnAjouterSous);
@@ -161,7 +161,7 @@ public class VueBureau implements Observateur {
             ligne.getChildren().addAll(lTitre, btnSup,lDate);
             if (sub.estComposite()) {
                 Button btnAdd = new Button("+");
-                btnAdd.setText("+ Sous-tâche");
+                btnAdd.setText("+");
                 btnAdd.setStyle("-fx-font-size: 9px; -fx-text-fill: blue;");
                 btnAdd.setUserData(sub);
                 boutonsInteractifs.add(btnAdd);

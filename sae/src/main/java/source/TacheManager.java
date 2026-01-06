@@ -168,21 +168,7 @@ public class TacheManager implements Sujet {
             }
         }
     }
-    private boolean supprimersoustache(Tache parent, Tache aSupprimer) {
-        if (!parent.estComposite()) return false;
-        TacheComposite composite = (TacheComposite) parent;
-        if (composite.retirerSousTache(aSupprimer)) {
-            return true;
-        }
-        for (Tache enfant : parent.getSousTaches()) {
-            if (enfant.estComposite()) {
-                if (supprimersoustache(enfant, aSupprimer)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+
 
     /**
      * Méthode pour ajouter les observateurs
