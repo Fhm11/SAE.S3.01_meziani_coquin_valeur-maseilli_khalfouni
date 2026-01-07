@@ -1,0 +1,229 @@
+
+@startuml
+class source.VueBureau {
+- VBox root
+- TacheManager modele
+- HBox conteneurColonnes
+- List<VBox> colonnesGraphiques
+- List<Button> boutonsInteractifs
+- List<VBox> cartesTaches
++ VBox getRoot()
++ List<Button> getBoutonsInteractifs()
++ List<VBox> getCartesTaches()
++ List<VBox> getColonnesGraphiques()
++ HBox getConteneurColonnes()
++ void actualiser()
+- VBox creerAffichageTache(Tache)
+- VBox creerColonne(String)
+- void afficherSousTachesRecursif(Tache,VBox)
+}
+
+
+class source.VueListe {
+- TacheManager modele
+- ScrollPane scrollPane
+- VBox contenuPrincipal
+- List<Button> boutonsInteractifs
+- List<VBox> cartesTaches
+- String[] JOURS_SEMAINE
++ ScrollPane getRoot()
++ List<Button> getBoutonsInteractifs()
++ List<VBox> getCartesTaches()
++ void actualiser()
+- VBox creerSectionJour(String)
+- VBox creerCarteTache(Tache)
+- VBox creerCarteSousTache(Tache,int)
+- String getStyleTitreParEtat(String)
+- String getStyleEtat(String)
+- String getEtatTexte(String)
+- void afficherSousTachesRecursif(Tache,VBox,int)
+}
+
+
+class source.TacheComposite {
+- List<Tache> sousTaches
++ boolean ajouterSousTache(Tache)
++ List<Tache> getSousTaches()
++ boolean estComposite()
++ boolean retirerSousTache(Tache)
++ int getNombreSousTaches()
+}
+
+
+class source.VueGantt {
+- ScrollPane sp
+- GridPane gp
+- TacheManager modele
+- List<String> JOURS_REF
++ ScrollPane getRoot()
++ void actualiser()
+- int trouverMaxOffsetRecursif(Tache)
+- int afficherTacheRecursif(Tache,int,int)
+- int calculerOffsetFin(Tache)
+- int dessinerLigneTache(Tache,int,int)
+}
+
+
+class source.TacheManager {
+- {static} TacheManager instance
+- ArrayList<Observateur> observateurs
+- ArrayList<Tache> listeTaches
+- {static} String FICHIER_SAUVEGARDE
+- {static} String FICHIER_COLONNES
+- ArrayList<String> colonnes
++ {static} TacheManager getInstance()
++ ArrayList<String> getColonnes()
+- void charger()
+- void sauvegarder()
++ void creerTacheSimple(String,String,String,String,String)
++ void creerTacheComposite(String,String,String,String,String)
++ void modifierTache(Tache,String,String,String)
++ void ajouterSousTache(Tache,String,String,boolean,String,String,String)
++ void supprimerTache(Tache)
++ void ajouterObservateur(Observateur)
++ void supprimerObservateur(Observateur)
++ void notifierObservateur()
++ ArrayList<Tache> getTaches()
++ void deplacerTache(Tache,String)
++ void ajouterColonne(String)
++ void supprimerColonne(String)
+- void chargerColonnes()
+- void initColonnesDefaut()
+- void sauvegarderColonnes()
+- boolean estIntervalleValide(Tache,String,String)
+- int calculerDistance(String,String)
++ void archiverTache(Tache)
++ void restaurerTache(Tache)
+}
+
+
+class source.VueFormulaire {
++ {static} void afficherFormulaireCreation(Controller)
++ {static} void afficherFormulaireModification(Tache,Controller)
++ {static} void afficherFormulaireSousTache(Tache,Controller)
+}
+
+class source.Controller {
+- TacheManager modele
+- Tache tacheEnDeplacement
++ void handle(ActionEvent)
++ void creerTache(String,String,boolean,String,String,String)
++ void modifierTache(Tache,String,String,String)
++ void ajouterSousTache(Tache,String,String,boolean,String,String,String)
++ void debuterDeplacement(Tache)
++ void finaliserDeplacement(String)
++ void ajouterColonne(String)
++ void supprimerColonne(String)
++ void changerJourTache(Tache,String)
+}
+
+
+class source.TacheSimple {
++ boolean ajouterSousTache(Tache)
++ List<Tache> getSousTaches()
++ boolean estComposite()
+}
+
+class source.VueArchive {
+- TacheManager modele
+- ScrollPane scrollPane
+- VBox contenuPrincipal
+- List<Button> boutonsInteractifs
++ ScrollPane getRoot()
++ List<Button> getBoutonsInteractifs()
++ void actualiser()
+- VBox creerCarteArchive(Tache)
+- boolean chercherArchivesRecursif(Tache)
+}
+
+
+class source.Main {
+- String STYLE_COLONNE
+- String STYLE_COLONNE_SURVOL
+- BorderPane rootPrincipal
+- VueBureau vueBureau
+- VueListe vueListe
+- VueGantt vueGantt
+- VueArchive vueArchive
+- Controller controleur
+- TacheManager modele
+- ComboBox<String> comboVue
++ void start(Stage)
+- HBox creerToolbar()
+- void basculerVue()
+- void configurerHandlersPourVueActive()
+- void reconfigurerHandlersPourVueActive()
+- void configurerHandlersCartesListe(VueListe,Controller)
+- void setupColonneDrop(VBox,String,Controller)
+- void configurerHandlersColonnes(VueBureau,Controller)
+- void configurerHandlersCartes(VueBureau,Controller)
+- void configurerBoutonsSuppressionColonne(VueBureau,Controller)
+- void configurerHandlersArchive(VueArchive,Controller)
++ {static} void main(String[])
+}
+
+
+class source.TacheFactory {
++ {static} Tache creerTacheSimple(String,String,String,String,String)
++ {static} Tache creerTacheComposite(String,String,String,String,String)
+}
+
+class source.VueTexte {
++ void actualiser()
+}
+
+interface source.Sujet {
++ void ajouterObservateur(Observateur)
++ void supprimerObservateur(Observateur)
++ void notifierObservateur()
+}
+
+interface source.Observateur {
++ void actualiser()
+}
+
+abstract class source.Tache {
+- String titre
+- String description
+- String etat
+- String jDebut
+- String jFin
+- String ancienEtat
+- String priorite
++ String getTitre()
++ String getDescription()
++ String getJDebut()
++ String getJFin()
++ void setTitre(String)
++ void setDescription(String)
++ void setJDebut(String)
++ void setJFin(String)
++ String toString()
++ {abstract}boolean ajouterSousTache(Tache)
++ {abstract}List<Tache> getSousTaches()
++ {abstract}boolean estComposite()
++ String getEtat()
++ void setEtat(String)
++ String getAncienEtat()
++ void setAncienEtat(String)
++ String getPriorite()
++ void setPriorite(String)
+}
+
+
+
+
+source.Observateur <|.. source.VueBureau
+source.Observateur <|.. source.VueListe
+java.io.Serializable <|.. source.TacheComposite
+source.Tache <|-- source.TacheComposite
+source.Observateur <|.. source.VueGantt
+source.Sujet <|.. source.TacheManager
+javafx.event.EventHandler <|.. source.Controller
+java.io.Serializable <|.. source.TacheSimple
+source.Tache <|-- source.TacheSimple
+source.Observateur <|.. source.VueArchive
+javafx.application.Application <|-- source.Main
+source.Observateur <|.. source.VueTexte
+java.io.Serializable <|.. source.Tache
+@enduml
