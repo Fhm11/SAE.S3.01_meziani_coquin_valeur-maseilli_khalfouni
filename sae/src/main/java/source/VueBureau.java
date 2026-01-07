@@ -90,6 +90,18 @@ public class VueBureau implements Observateur {
         Label labelTitre = new Label(t.getTitre());
         labelTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
 
+
+        Label labelPriorite = new Label(t.getPriorite().toUpperCase());
+        String stylePriorite = "-fx-font-size: 9px; -fx-text-fill: white; -fx-padding: 2 5; -fx-background-radius: 3; -fx-font-weight: bold;";
+
+        if ("Importante".equals(t.getPriorite())) {
+            labelPriorite.setStyle(stylePriorite + "-fx-background-color: #e74c3c;");
+        } else if ("Moyenne".equals(t.getPriorite())) {
+            labelPriorite.setStyle(stylePriorite + "-fx-background-color: #f1c40f;");
+        } else {
+            labelPriorite.setStyle(stylePriorite + "-fx-background-color: #008000;");
+        }
+
         Label labelDesc = new Label(t.getDescription());
         labelDesc.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px;");
         labelDesc.setWrapText(true);
@@ -115,7 +127,7 @@ public class VueBureau implements Observateur {
         boutonsInteractifs.add(btnSupprimer);
         boutons.getChildren().add(btnSupprimer);
 
-        conteneur.getChildren().addAll(labelTitre, labelDesc, boutons, labelDate);
+        conteneur.getChildren().addAll(labelTitre, labelPriorite, labelDesc, boutons, labelDate);
 
         if (t.estComposite()) {
             afficherSousTachesRecursif(t, conteneur);
@@ -162,13 +174,24 @@ public class VueBureau implements Observateur {
                 Label lDate = new Label("dta deb" + sub.getJDebut());
                 lDate.setStyle("-fx-text-fill: #999999; -fx-font-size: 10px;");
 
+                Label labelPriorite = new Label(sub.getPriorite().toUpperCase());
+                String stylePriorite = "-fx-font-size: 9px; -fx-text-fill: white; -fx-padding: 2 5; -fx-background-radius: 3; -fx-font-weight: bold;";
+
+                if ("Importante".equals(sub.getPriorite())) {
+                    labelPriorite.setStyle(stylePriorite + "-fx-background-color: #e74c3c;");
+                } else if ("Moyenne".equals(sub.getPriorite())) {
+                    labelPriorite.setStyle(stylePriorite + "-fx-background-color: #f1c40f;");
+                } else {
+                    labelPriorite.setStyle(stylePriorite + "-fx-background-color: #008000;");
+                }
+
                 Button btnSup = new Button("Archiver");
                 btnSup.setStyle(
                         "-fx-font-size: 9px; -fx-text-fill: white; -fx-background-color: #e67e22; -fx-padding: 2 6; -fx-background-radius: 4;");
                 btnSup.setUserData(sub);
                 boutonsInteractifs.add(btnSup);
 
-                ligne.getChildren().addAll(lTitre, btnSup, lDate);
+                ligne.getChildren().addAll(lTitre, labelPriorite, btnSup, lDate);
                 if (sub.estComposite()) {
                     Button btnAdd = new Button("+");
                     btnAdd.setText("+");

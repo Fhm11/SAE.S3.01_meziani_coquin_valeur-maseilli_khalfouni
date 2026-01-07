@@ -54,11 +54,11 @@ public class Controller implements EventHandler<ActionEvent> {
      * @param description  la descrption
      * @param estComposite true si elle peut avoir une sous-tâche, false sinon
      */
-    public void creerTache(String titre, String description, boolean estComposite, String debut, String fin) {
+    public void creerTache(String titre, String description, boolean estComposite, String debut, String fin, String prio) {
         if (estComposite) {
-            modele.creerTacheComposite(titre, description, debut, fin);
+            modele.creerTacheComposite(titre, description, debut, fin, prio);
         } else {
-            modele.creerTacheSimple(titre, description, debut, fin);
+            modele.creerTacheSimple(titre, description, debut, fin, prio);
         }
     }
 
@@ -69,8 +69,8 @@ public class Controller implements EventHandler<ActionEvent> {
      * @param titre       le titre modifié
      * @param description la description modifié
      */
-    public void modifierTache(Tache t, String titre, String description) {
-        modele.modifierTache(t, titre, description);
+    public void modifierTache(Tache t, String titre, String description, String prio) {
+        modele.modifierTache(t, titre, description, prio);
     }
 
     /**
@@ -81,9 +81,8 @@ public class Controller implements EventHandler<ActionEvent> {
      * @param titre       le titre de la sous-tâche
      * @param description la description de la sous-tâche
      */
-    public void ajouterSousTache(Tache parent, String titre, String description, boolean estComposite, String debut,
-            String fin) {
-        modele.ajouterSousTache(parent, titre, description, estComposite, debut, fin);
+    public void ajouterSousTache(Tache parent, String titre, String description, boolean estComposite, String debut, String fin, String prio) {
+        modele.ajouterSousTache(parent, titre, description, estComposite, debut, fin, prio);
     }
 
     /**

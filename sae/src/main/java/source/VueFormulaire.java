@@ -1,5 +1,6 @@
 package source;
 
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -28,6 +29,11 @@ public class VueFormulaire {
         ComboBox<String> comboFin = new ComboBox<>(jours);
         comboFin.setValue("Lundi");
 
+        javafx.collections.ObservableList<String> priorites =
+                javafx.collections.FXCollections.observableArrayList("Basse", "Moyenne", "Importante");
+        ComboBox<String> comboPriorite = new ComboBox<>(priorites);
+        comboPriorite.setValue("Moyenne");
+
         CheckBox chkComposite = new CheckBox("Peut avoir des sous-tâches");
         Button btnSave = new Button("Sauvegarder");
 
@@ -38,7 +44,8 @@ public class VueFormulaire {
                         txtDesc.getText(),
                         chkComposite.isSelected(),
                         comboDebut.getValue(),
-                        comboFin.getValue()
+                        comboFin.getValue(),
+                        comboPriorite.getValue()
                 );
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
@@ -51,6 +58,7 @@ public class VueFormulaire {
                 new Label("Description :"), txtDesc,
                 new Label("Jour Début :"), comboDebut,
                 new Label("Jour Fin :"), comboFin,
+                new Label("Priorite :"), comboPriorite,
                 chkComposite, btnSave
         );
         fenetre.setScene(new Scene(root, 300, 450));
@@ -70,11 +78,17 @@ public class VueFormulaire {
 
         TextField txtTitre = new TextField(t.getTitre());
         TextField txtDesc = new TextField(t.getDescription());
+
+        javafx.collections.ObservableList<String> optionsPriorite =
+                javafx.collections.FXCollections.observableArrayList("Basse", "Moyenne", "Importante");
+        ComboBox<String> comboPriorite = new ComboBox<>(optionsPriorite);
+        comboPriorite.setValue(t.getPriorite()); //
+
         Button btnSave = new Button("Sauvegarder");
 
         btnSave.setOnAction(e -> {
             try {
-                controleur.modifierTache(t, txtTitre.getText(), txtDesc.getText());
+                controleur.modifierTache(t, txtTitre.getText(), txtDesc.getText(), comboPriorite.getValue());
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
                 System.err.println(ex.getMessage());
@@ -84,6 +98,7 @@ public class VueFormulaire {
         root.getChildren().addAll(
                 new Label("Titre :"), txtTitre,
                 new Label("Description :"), txtDesc,
+                new Label("Priorite :"), comboPriorite,
                 btnSave
         );
         fenetre.setScene(new Scene(root, 300, 450));
@@ -114,6 +129,9 @@ public class VueFormulaire {
         CheckBox chkComposite = new CheckBox("Peut avoir une sous-tâche");
         Button btnSave = new Button("Ajouter");
 
+        ComboBox<String> comboPriorite = new ComboBox<>(FXCollections.observableArrayList("Basse", "Moyenne", "Importante"));
+        comboPriorite.setValue("Moyenne");
+
         btnSave.setOnAction(e -> {
             try {
                 controleur.ajouterSousTache(
@@ -122,7 +140,8 @@ public class VueFormulaire {
                         txtDesc.getText(),
                         chkComposite.isSelected(),
                         comboDebut.getValue(),
-                        comboFin.getValue()
+                        comboFin.getValue(),
+                        comboPriorite.getValue()
                 );
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
@@ -136,6 +155,7 @@ public class VueFormulaire {
                 new Label("Description :"), txtDesc,
                 new Label("Jour Début :"), comboDebut,
                 new Label("Jour Fin :"), comboFin,
+                new Label("Priorite :"), comboPriorite,
                 chkComposite,
                 btnSave
         );

@@ -75,11 +75,11 @@ public class TacheManager implements Sujet {
      * @param titre le titre
      * @param description la description
      */
-    public void creerTacheSimple(String titre, String description, String debut, String fin) {
+    public void creerTacheSimple(String titre, String description, String debut, String fin, String prio) {
         if (titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("titre obligatoire");
         }
-        Tache t = TacheFactory.creerTacheSimple(titre, description, debut, fin);
+        Tache t = TacheFactory.creerTacheSimple(titre, description, debut, fin, prio);
         if (!colonnes.isEmpty()) {
             t.setEtat(colonnes.get(0));
         }
@@ -93,11 +93,11 @@ public class TacheManager implements Sujet {
      * @param titre son titre
      * @param description sa description
      */
-    public void creerTacheComposite(String titre, String description, String debut, String fin) {
+    public void creerTacheComposite(String titre, String description, String debut, String fin, String prio) {
         if (titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("titre obligatoire");
         }
-        Tache t = TacheFactory.creerTacheComposite(titre, description, debut, fin);
+        Tache t = TacheFactory.creerTacheComposite(titre, description, debut, fin, prio);
         if (!colonnes.isEmpty()) {
             t.setEtat(colonnes.get(0));
         }
@@ -112,12 +112,13 @@ public class TacheManager implements Sujet {
      * @param titre son nouveau titre
      * @param description sa nouvelle description
      */
-    public void modifierTache(Tache t, String titre, String description) {
+    public void modifierTache(Tache t, String titre, String description, String prio) {
         if (t == null || titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("Paramètres invalides");
         }
         t.setTitre(titre);
         t.setDescription(description);
+        t.setPriorite(prio);
         notifierObservateur();
         sauvegarder();
     }
@@ -128,7 +129,7 @@ public class TacheManager implements Sujet {
      * @param titre son titre
      * @param description sa description
      */
-    public void ajouterSousTache(Tache parent, String titre, String description, boolean estComposite, String debut, String fin) {
+    public void ajouterSousTache(Tache parent, String titre, String description, boolean estComposite, String debut, String fin, String prio) {
         if (parent == null || !parent.estComposite() ||
                 titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("Impossible d'ajouter une sous-tâche");
@@ -141,9 +142,9 @@ public class TacheManager implements Sujet {
 
         Tache sousTache;
         if (estComposite) {
-            sousTache = TacheFactory.creerTacheComposite(titre, description, debut, fin);
+            sousTache = TacheFactory.creerTacheComposite(titre, description, debut, fin, prio);
         } else {
-            sousTache = TacheFactory.creerTacheSimple(titre, description, debut, fin);
+            sousTache = TacheFactory.creerTacheSimple(titre, description, debut, fin, prio);
         }
         TacheComposite composite = (TacheComposite) parent;
         composite.ajouterSousTache(sousTache);

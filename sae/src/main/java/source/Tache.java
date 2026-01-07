@@ -14,6 +14,7 @@ public abstract class Tache implements Serializable {
     private String jDebut;
     private String jFin;
     private String ancienEtat;
+    private String priorite = "Moyenne";
 
     /**
      * Constructeur créant une tâche
@@ -117,4 +118,8 @@ public abstract class Tache implements Serializable {
     public void setAncienEtat(String ancienEtat) {
         this.ancienEtat = ancienEtat;
     }
+
+    public String getPriorite() { return priorite; }
+
+    public void setPriorite(String priorite) { this.priorite = priorite; }
 }

@@ -145,7 +145,16 @@ public class VueListe implements Observateur {
         Label infoEtat = new Label("État: " + getEtatTexte(tache.getEtat()));
         infoEtat.setStyle(getStyleEtat(tache.getEtat()));
 
-        infoBox.getChildren().addAll(infoJour, infoEtat);
+        Label infoPrio = new Label(" | Prio: " + tache.getPriorite());
+        if ("Importante".equals(tache.getPriorite())) {
+            infoPrio.setStyle("-fx-font-size: 10px; -fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+        } else if ("Moyenne".equals(tache.getPriorite())) {
+            infoPrio.setStyle("-fx-font-size: 10px; -fx-text-fill: #f1c40f; -fx-font-weight: bold;");
+        } else {
+            infoPrio.setStyle("-fx-font-size: 10px; -fx-text-fill: #008000;");
+        }
+
+        infoBox.getChildren().addAll(infoJour, infoEtat, infoPrio);
 
         // boutons d'action
         HBox boutons = new HBox(5);
@@ -185,6 +194,14 @@ public class VueListe implements Observateur {
 
         Label titre = new Label(sousTache.getTitre());
         titre.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        if ("Importante".equals(sousTache.getPriorite())) {
+            titre.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 11px; -fx-font-weight: bold;");
+        } else if ("Moyenne".equals(sousTache.getPriorite())) {
+            titre.setStyle( "-fx-text-fill: #f1c40f; -fx-font-size: 11px; -fx-font-weight: bold;");
+        } else {
+            titre.setStyle("-fx-text-fill: #008000; -fx-font-size: 11px; -fx-font-weight: bold;");
+        }
 
         Button btnArchiver = new Button("Archiver");
         btnArchiver.setStyle(
