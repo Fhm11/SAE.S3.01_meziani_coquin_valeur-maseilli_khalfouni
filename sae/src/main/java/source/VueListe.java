@@ -198,7 +198,7 @@ public class VueListe implements Observateur {
         if ("Importante".equals(sousTache.getPriorite())) {
             titre.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 11px; -fx-font-weight: bold;");
         } else if ("Moyenne".equals(sousTache.getPriorite())) {
-            titre.setStyle( "-fx-text-fill: #f1c40f; -fx-font-size: 11px; -fx-font-weight: bold;");
+            titre.setStyle("-fx-text-fill: #f1c40f; -fx-font-size: 11px; -fx-font-weight: bold;");
         } else {
             titre.setStyle("-fx-text-fill: #008000; -fx-font-size: 11px; -fx-font-weight: bold;");
         }
@@ -206,6 +206,7 @@ public class VueListe implements Observateur {
         Button btnArchiver = new Button("Archiver");
         btnArchiver.setStyle(
                 "-fx-font-size: 9px; -fx-text-fill: white; -fx-background-color: #e67e22; -fx-padding: 2 6; -fx-background-radius: 4;");
+        btnArchiver.setUserData(sousTache);
         boutonsInteractifs.add(btnArchiver);
 
         ligneTitre.getChildren().addAll(point, titre, btnArchiver);
