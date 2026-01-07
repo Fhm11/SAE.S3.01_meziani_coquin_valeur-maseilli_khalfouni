@@ -1,0 +1,15 @@
+fonctionnalites:
+-vue archive
+-gestion archivage
+-correction gantt
+-gestion priorite
+-drang and drop des sous taches
+-test unitaire
+
+
+qui les a fait:
+
+Fahim: vue archive, gestion d archive
+Arnaud: correction gantt, gestion priorite 
+Marius: Drag and drop des sous taches
+Fady: test unitaire
