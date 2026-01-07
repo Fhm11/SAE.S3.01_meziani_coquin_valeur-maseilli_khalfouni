@@ -1,0 +1,15 @@
+fonctionnalites:
+-vue gantt
+-vu Liste
+-cree surpprimer les colonnes
+- gestion de sous tache de sous tache
+- modifiaction des sous taches
+-test unitaire
+
+
+qui les a fait:
+
+Fahim: cree suprrimer les colonnes, gestion des sous tache de sous tache, modification des sous taches
+Arnaud: vue gantt
+Marius: vue Liste
+Fady: test unitaire
