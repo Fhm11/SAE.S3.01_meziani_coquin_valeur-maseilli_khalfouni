@@ -4,3 +4,4 @@ Toutes les vues (Bureau, Liste, Gantt) se mettent à jour en même temps quand o
 Le code est bien organisé grâce à l'architecture MVC et la sauvegarde se fait toute seule. 
 Pour les bug jsute quand on veut modifier une sous tache la fenetre pour modifier la tache mere arrive
 en premiere puis celle de sous la premiere sous tache et ainsi de suite.
+Quand une tache mere devient sous tache sa couleur ne change pas dans le gantt et reste comme une mere.
