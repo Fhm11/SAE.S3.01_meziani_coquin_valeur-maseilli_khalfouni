@@ -62,7 +62,7 @@ public class VueFormulaire {
                 new Label("Jour Fin :"), comboFin,
                 new Label("Priorite :"), comboPriorite,
                 chkComposite, btnSave);
-        fenetre.setScene(new Scene(root, 300, 450));
+        fenetre.setScene(new Scene(root, 450, 500));
         fenetre.setTitle("Créer une tâche");
         fenetre.show();
     }
