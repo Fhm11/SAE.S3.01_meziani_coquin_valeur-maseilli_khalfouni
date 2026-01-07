@@ -46,7 +46,8 @@ public class VueArchive implements Observateur {
         }
         if (vide) {
             Label lblVide = new Label("0");
-            lblVide.setStyle("-fx-text-fill: gray; -fx-font-style: italic;");
+            lblVide.setStyle("-fx-text-fill: gray; -fx-font-style: italic;-fx-font-weight: bold; -fx-font-size: 60px;");
+            lblVide.setAlignment(Pos.CENTER);
             contenuPrincipal.getChildren().add(lblVide);
         }
     }
