@@ -3,6 +3,7 @@ package source;
 import java.util.ArrayList;
 import java.io.*;
 import java.io.File;
+import java.util.*;
 
 public class TacheManager implements Sujet {
     private static TacheManager instance;
@@ -132,6 +133,12 @@ public class TacheManager implements Sujet {
                 titre == null || titre.trim().isEmpty()) {
             throw new IllegalArgumentException("Impossible d'ajouter une sous-tâche");
         }
+
+        if (!estIntervalleValide(parent, debut, fin)) {
+            throw new IllegalArgumentException("La sous-tâche doit être comprise entre " +
+                    parent.getJDebut() + " et " + parent.getJFin());
+        }
+
         Tache sousTache;
         if (estComposite) {
             sousTache = TacheFactory.creerTacheComposite(titre, description, debut, fin);
@@ -269,5 +276,16 @@ public class TacheManager implements Sujet {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean estIntervalleValide(Tache parent, String debutEnfant, String finenfant) {
+        List<String> joursRef = Arrays.asList("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche");
+
+        int debParent = joursRef.indexOf(parent.getJDebut());
+        int finParent = joursRef.indexOf(parent.getJFin());
+        int debEnfant = joursRef.indexOf(debutEnfant);
+        int finEnfant = joursRef.indexOf(finenfant);
+
+        return debEnfant >= debParent && finEnfant <= finParent && debEnfant <= finEnfant;
     }
 }

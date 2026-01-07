@@ -8,8 +8,6 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import java.util.Optional;
-
 public class Main extends Application {
 
     // style par défaut des colonnes

@@ -159,4 +159,28 @@ class TestTacheAvance {
 
         assertFalse(manager.getTaches().contains(t));
     }
+
+    @Test
+    void testValidationIntervalleSousTache() {
+        manager.creerTacheComposite("Parent", "Desc", "Lundi", "Mardi");
+        Tache parent = manager.getTaches().get(0);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            controller.ajouterSousTache(parent, "Sous-tache invalide", "Desc", false, "Mardi", "Mercredi");
+        });
+
+        assertTrue(exception.getMessage().contains("La sous-tâche doit être comprise entre Lundi et Mardi"));
+    }
+
+    @Test
+    void testIntervalleValideSousTache() {
+        manager.creerTacheComposite("Parent", "Desc", "Lundi", "Vendredi");
+        Tache parent = manager.getTaches().get(0);
+
+        assertDoesNotThrow(() -> {
+            controller.ajouterSousTache(parent, "Sous-tache valide", "Desc", false, "Mardi", "Jeudi");
+        });
+
+        assertEquals(1, parent.getSousTaches().size());
+    }
 }
