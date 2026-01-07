@@ -35,12 +35,7 @@ public class VueGantt implements Observateur {
 
         int maxOffset = 6;
         for (Tache t : modele.getTaches()) {
-            maxOffset = Math.max(maxOffset, calculerOffsetFin(t));
-            if (t.estComposite()) {
-                for (Tache st : t.getSousTaches()) {
-                    maxOffset = Math.max(maxOffset, calculerOffsetFin(st));
-                }
-            }
+            maxOffset = Math.max(maxOffset, trouverMaxOffsetRecursif(t));
         }
 
         gp.getColumnConstraints().add(new ColumnConstraints(150));
@@ -56,15 +51,31 @@ public class VueGantt implements Observateur {
             gp.add(lbl, i + 1, 0);
         }
 
-        int ligne = 1;
+        int ligneCourante = 1;
         for (Tache t : modele.getTaches()) {
-            ligne = dessinerLigneTache(t, ligne, 0);
-            if (t.estComposite()) {
-                for (Tache st : t.getSousTaches()) {
-                    ligne = dessinerLigneTache(st, ligne, 1);
-                }
+            ligneCourante = afficherTacheRecursif(t, ligneCourante, 0);
+        }
+    }
+
+    private int trouverMaxOffsetRecursif(Tache t) {
+        int max = calculerOffsetFin(t);
+        if (t.estComposite()) {
+            for (Tache st : t.getSousTaches()) {
+                max = Math.max(max, trouverMaxOffsetRecursif(st));
             }
         }
+        return max;
+    }
+
+    private int afficherTacheRecursif(Tache t, int numLigne, int niveau) {
+        int prochaineLigne = dessinerLigneTache(t, numLigne, niveau);
+
+        if (t.estComposite()) {
+            for (Tache st : t.getSousTaches()) {
+                prochaineLigne = afficherTacheRecursif(st, prochaineLigne, niveau + 1);
+            }
+        }
+        return prochaineLigne;
     }
 
     private int calculerOffsetFin(Tache t) {
@@ -84,7 +95,11 @@ public class VueGantt implements Observateur {
         Label barre = new Label(t.getTitre());
         String baseStyle = "-fx-text-fill: white; -fx-padding: 8; -fx-background-radius: 5; -fx-font-size: 13px; -fx-font-weight: bold; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);";
 
-        String color = (niveau > 0) ? "#5dade2" : "#3498db";
+        String color;
+        if (niveau == 0) color = "#3498db";
+        else if (niveau == 1) color = "#5dade2";
+        else color = "#aed6f1";
+
         barre.setStyle("-fx-background-color: " + color + "; " + baseStyle);
         barre.setMaxWidth(Double.MAX_VALUE);
 

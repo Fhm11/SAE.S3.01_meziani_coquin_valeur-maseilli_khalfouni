@@ -278,14 +278,24 @@ public class TacheManager implements Sujet {
         }
     }
 
-    private boolean estIntervalleValide(Tache parent, String debutEnfant, String finenfant) {
+    private boolean estIntervalleValide(Tache parent, String debutEnfant, String finEnfant) {
+        int dureeParent = calculerDistance(parent.getJFin(), parent.getJDebut());
+
+        int posDebutEnfant = calculerDistance(debutEnfant, parent.getJDebut());
+
+        int posFinEnfant = calculerDistance(finEnfant, parent.getJDebut());
+
+        return posDebutEnfant <= dureeParent && posFinEnfant <= dureeParent && posDebutEnfant <= posFinEnfant;
+    }
+
+    private int calculerDistance(String jourCible, String jourDepart) {
         List<String> joursRef = Arrays.asList("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche");
+        int idxDep = joursRef.indexOf(jourDepart);
+        int idxCible = joursRef.indexOf(jourCible);
 
-        int debParent = joursRef.indexOf(parent.getJDebut());
-        int finParent = joursRef.indexOf(parent.getJFin());
-        int debEnfant = joursRef.indexOf(debutEnfant);
-        int finEnfant = joursRef.indexOf(finenfant);
-
-        return debEnfant >= debParent && finEnfant <= finParent && debEnfant <= finEnfant;
+        if (idxCible < idxDep) {
+            return idxCible + 7 - idxDep;
+        }
+        return idxCible - idxDep;
     }
 }
