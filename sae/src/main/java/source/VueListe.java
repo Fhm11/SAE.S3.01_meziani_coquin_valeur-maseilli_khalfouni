@@ -47,7 +47,7 @@ public class VueListe implements Observateur {
 
     @Override
     public void actualiser() {
-        // réinitialiser
+        // réinitialiser -> supprime tout l'ancien contenu
         contenuPrincipal.getChildren().clear();
         boutonsInteractifs.clear();
         cartesTaches.clear();
@@ -60,8 +60,8 @@ public class VueListe implements Observateur {
             // ajouter les tâches pour ce jour
             boolean hasTaches = false;
             for (Tache tache : modele.getTaches()) {
-                if (jour.equals(tache.getJDebut())) {
-                    hasTaches = true;
+                if (jour.equals(tache.getJDebut())) { // vérifie si la tâche commence ce jour
+                        hasTaches = true;
                     VBox carte = creerCarteTache(tache);
                     cartesTaches.add(carte);
                     sectionJour.getChildren().add(carte);
@@ -83,9 +83,10 @@ public class VueListe implements Observateur {
                 sectionJour.getChildren().add(labelVide);
             }
 
+            // ajout de la section du jour au contenu principal
             contenuPrincipal.getChildren().add(sectionJour);
 
-            // ajouter un séparateur entre les jours (sauf après le dernier)
+            // séparateur entre les jours (sauf après le dernier)
             if (!jour.equals(JOURS_SEMAINE[JOURS_SEMAINE.length - 1])) {
                 Separator separator = new Separator();
                 separator.setPadding(new Insets(10, 0, 10, 0));
@@ -94,11 +95,12 @@ public class VueListe implements Observateur {
         }
     }
 
+    // crée une section visuelle pour un jour donné
     private VBox creerSectionJour(String jour) {
         VBox section = new VBox(8);
         section.setPadding(new Insets(5));
 
-        // Titre du jour
+        // titre du jour
         Label titreJour = new Label(jour);
         titreJour.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; " +
                 "-fx-text-fill: #2c3e50; -fx-padding: 0 0 8 0;");
@@ -107,6 +109,7 @@ public class VueListe implements Observateur {
         return section;
     }
 
+    // crée une carte visuelle pour une tâche (principale)
     private VBox creerCarteTache(Tache tache) {
         VBox carte = new VBox(5);
         carte.setPadding(new Insets(8));
@@ -115,7 +118,7 @@ public class VueListe implements Observateur {
                 "-fx-border-radius: 4; -fx-background-radius: 4; " +
                 "-fx-border-color: #e0e0e0; -fx-border-width: 1;");
 
-        carte.setUserData(tache);
+        carte.setUserData(tache); // stocke la tâche dans la carte pour la retrouver
 
         // titre avec indicateur d'état
         Label titre = new Label(tache.getTitre());
@@ -160,6 +163,7 @@ public class VueListe implements Observateur {
         return carte;
     }
 
+    // crée une carte visuelle pour une sous-tâche
     private VBox creerCarteSousTache(Tache sousTache, int niveau) {
         VBox carte = new VBox(3);
         carte.setUserData(sousTache);
@@ -176,6 +180,8 @@ public class VueListe implements Observateur {
         titre.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px; -fx-font-weight: bold;");
 
         ligneTitre.getChildren().addAll(point, titre);
+
+        // bouton "+" si la sous-tâche elle-même est composite
         if (sousTache.estComposite()) {
             Button btnAdd = new Button("+");
             btnAdd.setStyle("-fx-font-size: 9px; -fx-text-fill: blue; -fx-padding: 2 5;");
@@ -183,6 +189,7 @@ public class VueListe implements Observateur {
             boutonsInteractifs.add(btnAdd);
             ligneTitre.getChildren().add(btnAdd);
         }
+
         Label description = new Label(sousTache.getDescription());
         description.setStyle("-fx-text-fill: #777777; -fx-font-size: 10px;");
         description.setWrapText(true);
@@ -192,6 +199,7 @@ public class VueListe implements Observateur {
         return carte;
     }
 
+    // détermine le style CSS du titre selon l'état de la tâche
     private String getStyleTitreParEtat(String etat) {
         switch (etat) {
             case "En cours":
@@ -204,6 +212,7 @@ public class VueListe implements Observateur {
         }
     }
 
+    // détermine le style CSS du label d'état
     private String getStyleEtat(String etat) {
         switch (etat) {
             case "En cours":
@@ -215,6 +224,7 @@ public class VueListe implements Observateur {
         }
     }
 
+    // convertit le code d'état en texte lisible
     private String getEtatTexte(String etat) {
         switch (etat) {
             case "afaire":

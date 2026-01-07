@@ -149,7 +149,7 @@ public class Main extends Application {
             configurerHandlersCartes(vueBureau, controleur);
             configurerBoutonsSuppressionColonne(vueBureau, controleur);
         } else if (rootPrincipal.getCenter() == vueListe.getRoot()) {
-            configurerHandlersCartesListe(vueListe, controleur);
+            configurerHandlersCartesListe(vueListe, controleur); // réattache les handlers
         }
     }
 
@@ -165,8 +165,8 @@ public class Main extends Application {
         for (VBox carte : vue.getCartesTaches()) {
             carte.setOnMouseClicked(e -> {
                 if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
-                    Tache t = (Tache) carte.getUserData();
-                    VueFormulaire.afficherFormulaireModification(t, controleur);
+                    Tache t = (Tache) carte.getUserData(); // récupère la tâche
+                    VueFormulaire.afficherFormulaireModification(t, controleur); // ouvre le formulaire
                 }
             });
         }
