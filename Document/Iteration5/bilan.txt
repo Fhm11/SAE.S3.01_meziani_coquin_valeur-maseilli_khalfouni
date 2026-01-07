@@ -5,3 +5,4 @@ Le code est bien organisé grâce à l'architecture MVC et la sauvegarde se fait
 Pour les bug jsute quand on veut modifier une sous tache la fenetre pour modifier la tache mere arrive
 en premiere puis celle de sous la premiere sous tache et ainsi de suite.
 Quand une tache mere devient sous tache sa couleur ne change pas dans le gantt et reste comme une mere.
+Petite erreur on a tous mis dans le main a place de controller et sera normalement modifer a la prochaine iteration
