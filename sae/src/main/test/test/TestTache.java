@@ -24,7 +24,7 @@ class TestTache {
 
     @Test
     void testCreationTacheSimpleValide() {
-        Tache t = TacheFactory.creerTacheSimple("Titre1", "Description1", "Lundi", "Lundi");
+        Tache t = TacheFactory.creerTacheSimple("Titre1", "Description1", "Lundi", "Lundi", "Important");
 
         assertNotNull(t);
         assertEquals("Titre1", t.getTitre());
@@ -36,10 +36,10 @@ class TestTache {
 
     @Test
     void testCreationTacheComposite() {
-        Tache compo = TacheFactory.creerTacheComposite("Projet", "Gros projet", "Lundi", "Lundi");
+        Tache compo = TacheFactory.creerTacheComposite("Projet", "Gros projet", "Lundi", "Lundi", "Important");
         assertTrue(compo.estComposite());
 
-        Tache sousTache = TacheFactory.creerTacheSimple("Sous-tâche", "Détail", "Lundi", "Lundi");
+        Tache sousTache = TacheFactory.creerTacheSimple("Sous-tâche", "Détail", "Lundi", "Lundi", "Important");
         compo.ajouterSousTache(sousTache);
 
         assertEquals(1, compo.getSousTaches().size());
@@ -49,7 +49,7 @@ class TestTache {
     @Test
     void testTitreNull() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            TacheFactory.creerTacheSimple(null, "idk", "Lundi", "Lundi");
+            TacheFactory.creerTacheSimple(null, "idk", "Lundi", "Lundi", "Important");
         });
         assertEquals("titre obligatoire", exception.getMessage());
     }
@@ -57,15 +57,15 @@ class TestTache {
     @Test
     void testTitreVide() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            TacheFactory.creerTacheSimple("", "idk", "Lundi", "Lundi");
+            TacheFactory.creerTacheSimple("", "idk", "Lundi", "Lundi", "Important");
         });
         assertEquals("titre obligatoire", exception.getMessage());
     }
 
     @Test
     void testAjoutViaManager() {
-        manager.creerTacheSimple("T1", "D1", "Lundi", "Lundi");
-        manager.creerTacheComposite("C1", "D2", "Lundi", "Lundi");
+        manager.creerTacheSimple("T1", "D1", "Lundi", "Lundi", "Important");
+        manager.creerTacheComposite("C1", "D2", "Lundi", "Lundi", "Important");
 
         assertEquals(2, manager.getTaches().size());
         assertTrue(manager.getTaches().get(1).estComposite());
@@ -73,7 +73,7 @@ class TestTache {
 
     @Test
     void testSuppressionTache() {
-        manager.creerTacheSimple("A supprimer", "desc", "Lundi", "Lundi");
+        manager.creerTacheSimple("A supprimer", "desc", "Lundi", "Lundi", "Important");
         Tache t = manager.getTaches().get(0);
 
         manager.supprimerTache(t);
@@ -83,10 +83,10 @@ class TestTache {
 
     @Test
     void testModifierTache() {
-        manager.creerTacheSimple("Ancien Titre", "Ancienne Description", "Lundi", "Lundi");
+        manager.creerTacheSimple("Ancien Titre", "Ancienne Description", "Lundi", "Lundi", "Important");
         Tache t = manager.getTaches().get(0);
 
-        manager.modifierTache(t, "Nouveau Titre", "Nouvelle Description");
+        manager.modifierTache(t, "Nouveau Titre", "Nouvelle Description", "Important");
 
         assertEquals("Nouveau Titre", t.getTitre());
         assertEquals("Nouvelle Description", t.getDescription());

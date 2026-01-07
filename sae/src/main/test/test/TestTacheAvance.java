@@ -25,7 +25,7 @@ class TestTacheAvance {
 
     @Test
     void testSerializationSauvegarde() {
-        manager.creerTacheSimple("Tache Sauvegarde", "Description", "Lundi", "Lundi");
+        manager.creerTacheSimple("Tache Sauvegarde", "Description", "Lundi", "Lundi", "Important");
 
         File fichier = new File("taches.sauvegarde");
         assertTrue(fichier.exists());
@@ -33,9 +33,9 @@ class TestTacheAvance {
 
     @Test
     void testDeplacementTacheViaController() {
-        manager.creerTacheSimple("Tache Drag", "Desc", "Lundi", "Lundi");
+        manager.creerTacheSimple("Tache Drag", "Desc", "Lundi", "Lundi",  "Important");
         Tache t = manager.getTaches().get(0);
-        assertEquals("afaire", t.getEtat());
+        assertEquals("À faire", t.getEtat());
 
         controller.debuterDeplacement(t);
         controller.finaliserDeplacement("encours");
@@ -45,7 +45,7 @@ class TestTacheAvance {
 
     @Test
     void testDeplacementTacheDirectManager() {
-        manager.creerTacheSimple("Tache Manager", "Desc", "Lundi", "Lundi");
+        manager.creerTacheSimple("Tache Manager", "Desc", "Lundi", "Lundi",  "Important");
         Tache t = manager.getTaches().get(0);
 
         manager.deplacerTache(t, "terminer");
@@ -55,19 +55,19 @@ class TestTacheAvance {
 
     @Test
     void testDeplacementNull() {
-        manager.creerTacheSimple("Tache", "Desc", "Lundi", "Lundi");
+        manager.creerTacheSimple("Tache", "Desc", "Lundi", "Lundi",  "Important");
         Tache t = manager.getTaches().get(0);
 
         controller.debuterDeplacement(t);
         controller.finaliserDeplacement(null);
 
-        assertEquals("afaire", t.getEtat());
+        assertEquals("À faire", t.getEtat());
     }
 
     @Test
     void testChargementDonnees() {
         manager.getTaches().clear();
-        manager.creerTacheSimple("Persistance", "Verif", "Lundi", "Lundi");
+        manager.creerTacheSimple("Persistance", "Verif", "Lundi", "Lundi",  "Important");
 
         ArrayList<Tache> listeAvant = new ArrayList<>(manager.getTaches());
 
@@ -85,14 +85,14 @@ class TestTacheAvance {
 
     @Test
     void testEtatInitialNouvelleTache() {
-        controller.creerTache("Test Etat", "Desc", false, "Lundi", "Lundi");
+        controller.creerTache("Test Etat", "Desc", false, "Lundi", "Lundi",  "Important");
         Tache t = manager.getTaches().get(0);
-        assertEquals("afaire", t.getEtat());
+        assertEquals("À faire", t.getEtat());
     }
 
     @Test
     void testCreerTacheAvecJours() {
-        controller.creerTache("Tache Gantt", "Description", false, "Mardi", "Vendredi");
+        controller.creerTache("Tache Gantt", "Description", false, "Mardi", "Vendredi",  "Important");
         Tache t = manager.getTaches().get(0);
 
         assertEquals("Mardi", t.getJDebut());
@@ -101,10 +101,10 @@ class TestTacheAvance {
 
     @Test
     void testAjouterSousTacheAvecJours() {
-        manager.creerTacheComposite("Parent", "Desc", "Lundi", "Dimanche");
+        manager.creerTacheComposite("Parent", "Desc", "Lundi", "Dimanche", "Important");
         Tache parent = manager.getTaches().get(0);
 
-        controller.ajouterSousTache(parent, "Sous-tache", "Desc", false, "Mercredi", "Jeudi");
+        controller.ajouterSousTache(parent, "Sous-tache", "Desc", false, "Mercredi", "Jeudi", "Important");
 
         Tache enfant = parent.getSousTaches().get(0);
         assertEquals("Mercredi", enfant.getJDebut());
@@ -126,7 +126,7 @@ class TestTacheAvance {
 
     @Test
     void testChangerJourTache() {
-        manager.creerTacheSimple("Tache Temp", "Desc", "Lundi", "Lundi");
+        manager.creerTacheSimple("Tache Temp", "Desc", "Lundi", "Lundi",   "Important");
         Tache t = manager.getTaches().get(0);
 
         controller.changerJourTache(t, "Samedi");
@@ -151,7 +151,7 @@ class TestTacheAvance {
     @Test
     void testSuppressionColonneNettoieTaches() {
         controller.ajouterColonne("jsp");
-        manager.creerTacheSimple("titre", "Desc", "Lundi", "Mardi");
+        manager.creerTacheSimple("titre", "Desc", "Lundi", "Mardi", "Important");
         Tache t = manager.getTaches().get(0);
         t.setEtat("jsp");
 
@@ -162,11 +162,11 @@ class TestTacheAvance {
 
     @Test
     void testValidationIntervalleSousTache() {
-        manager.creerTacheComposite("Parent", "Desc", "Lundi", "Mardi");
+        manager.creerTacheComposite("Parent", "Desc", "Lundi", "Mardi",  "Important");
         Tache parent = manager.getTaches().get(0);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            controller.ajouterSousTache(parent, "Sous-tache invalide", "Desc", false, "Mardi", "Mercredi");
+            controller.ajouterSousTache(parent, "Sous-tache invalide", "Desc", false, "Mardi", "Mercredi",  "Important");
         });
 
         assertTrue(exception.getMessage().contains("La sous-tâche doit être comprise entre Lundi et Mardi"));
@@ -174,11 +174,11 @@ class TestTacheAvance {
 
     @Test
     void testIntervalleValideSousTache() {
-        manager.creerTacheComposite("Parent", "Desc", "Lundi", "Vendredi");
+        manager.creerTacheComposite("Parent", "Desc", "Lundi", "Vendredi", "Important");
         Tache parent = manager.getTaches().get(0);
 
         assertDoesNotThrow(() -> {
-            controller.ajouterSousTache(parent, "Sous-tache valide", "Desc", false, "Mardi", "Jeudi");
+            controller.ajouterSousTache(parent, "Sous-tache valide", "Desc", false, "Mardi", "Jeudi", "Important");
         });
 
         assertEquals(1, parent.getSousTaches().size());
