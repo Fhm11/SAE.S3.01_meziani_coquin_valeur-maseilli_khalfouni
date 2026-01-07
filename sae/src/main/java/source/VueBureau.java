@@ -1,26 +1,20 @@
 package source;
 
+import javafx.geometry.Pos;
+import javafx.scene.layout.*;
+import javafx.scene.control.*;
+import javafx.geometry.Insets;
 import java.util.ArrayList;
 import java.util.List;
-
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 
 public class VueBureau implements Observateur {
     private VBox root;
     private TacheManager modele;
-
     private HBox conteneurColonnes;
     private List<VBox> colonnesGraphiques = new ArrayList<>();
-
     private List<Button> boutonsInteractifs = new ArrayList<>();
     private List<VBox> cartesTaches = new ArrayList<>();
+    private List<HBox> sousTachesBoxes = new ArrayList<>();
 
     public VueBureau(TacheManager modele) {
         this.modele = modele;
@@ -52,6 +46,10 @@ public class VueBureau implements Observateur {
         return cartesTaches;
     }
 
+    public List<HBox> getSousTachesBoxes() {
+        return sousTachesBoxes;
+    }
+
     public List<VBox> getColonnesGraphiques() {
         return colonnesGraphiques;
     }
@@ -66,6 +64,7 @@ public class VueBureau implements Observateur {
         colonnesGraphiques.clear();
         boutonsInteractifs.clear();
         cartesTaches.clear();
+        sousTachesBoxes.clear();
 
         for (String nomColonne : modele.getColonnes()) {
             VBox colBox = creerColonne(nomColonne);
@@ -84,12 +83,13 @@ public class VueBureau implements Observateur {
     private VBox creerAffichageTache(Tache t) {
         VBox conteneur = new VBox(5);
         conteneur.setPadding(new Insets(10));
-        conteneur.setStyle(
-                "-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1); -fx-background-radius: 5;");
+        String styleOrigine = "-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1); -fx-background-radius: 5;";
+        conteneur.getProperties().put("style_origine", styleOrigine);
+        conteneur.setStyle(styleOrigine);
         conteneur.setUserData(t);
+
         Label labelTitre = new Label(t.getTitre());
         labelTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
-
 
         Label labelPriorite = new Label(t.getPriorite().toUpperCase());
         String stylePriorite = "-fx-font-size: 9px; -fx-text-fill: white; -fx-padding: 2 5; -fx-background-radius: 3; -fx-font-weight: bold;";
@@ -130,7 +130,7 @@ public class VueBureau implements Observateur {
         conteneur.getChildren().addAll(labelTitre, labelPriorite, labelDesc, boutons, labelDate);
 
         if (t.estComposite()) {
-            afficherSousTachesRecursif(t, conteneur);
+            afficherSousTachesRecursif(t, conteneur, 1);
         }
         return conteneur;
     }
@@ -139,8 +139,11 @@ public class VueBureau implements Observateur {
         VBox col = new VBox(10);
         col.setPadding(new Insets(10));
         col.setMinWidth(250);
-        col.setStyle("-fx-border-color: lightgray; -fx-border-width: 1; -fx-background-color: #f4f4f4;");
+        String styleOrigine = "-fx-border-color: lightgray; -fx-border-width: 1; -fx-background-color: #f4f4f4;";
+        col.setStyle(styleOrigine);
+        col.getProperties().put("style_origine", styleOrigine);
         col.setUserData(titre);
+
         HBox header = new HBox(10);
         header.setAlignment(Pos.CENTER_LEFT);
         Label lblTitre = new Label(titre);
@@ -148,8 +151,7 @@ public class VueBureau implements Observateur {
         lblTitre.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(lblTitre, Priority.ALWAYS);
         Button btnSupCol = new Button("X");
-        btnSupCol.setStyle(
-                "-fx-text-fill: white; -fx-background-color: #ff4444; -fx-font-size: 10px; -fx-font-weight: bold;");
+        btnSupCol.setStyle("-fx-text-fill: white; -fx-background-color: #ff4444; -fx-font-size: 10px; -fx-font-weight: bold;");
         btnSupCol.setUserData(titre);
         boutonsInteractifs.add(btnSupCol);
         header.getChildren().addAll(lblTitre, btnSupCol);
@@ -157,22 +159,27 @@ public class VueBureau implements Observateur {
         return col;
     }
 
-    private void afficherSousTachesRecursif(Tache parent, VBox conteneurParent) {
+    private void afficherSousTachesRecursif(Tache parent, VBox conteneurParent, int niveau) {
         if (!parent.estComposite())
             return;
         for (Tache sub : parent.getSousTaches()) {
             if (!"archive".equals(sub.getEtat())) {
-                VBox boxSousTache = new VBox(2);
-                boxSousTache.setPadding(new Insets(2, 0, 2, 20));
+                HBox boxSousTache = new HBox(5);
+
+                int decalage = 20 + (niveau * 15);
+                boxSousTache.setPadding(new Insets(2, 0, 2, decalage));
+
+                // style avec bordure gauche pour montrer la hiérarchie
                 boxSousTache.setStyle("-fx-border-color: #eeeeee; -fx-border-width: 0 0 0 2;");
                 boxSousTache.setUserData(sub);
-                cartesTaches.add(boxSousTache);
-                HBox ligne = new HBox(5);
-                ligne.setAlignment(Pos.CENTER_LEFT);
+
+                // ajouter aux listes pour pouvoir les manipuler
+                sousTachesBoxes.add(boxSousTache); // Pour le drag & drop
+
+                // contenu de la sous-tâche
                 Label lTitre = new Label("• " + sub.getTitre());
                 lTitre.setStyle("-fx-text-fill: #333333; -fx-font-size: 11px; -fx-font-weight: bold;");
-                Label lDate = new Label("dta deb" + sub.getJDebut());
-                lDate.setStyle("-fx-text-fill: #999999; -fx-font-size: 10px;");
+                lTitre.setUserData(sub);
 
                 Label labelPriorite = new Label(sub.getPriorite().toUpperCase());
                 String stylePriorite = "-fx-font-size: 9px; -fx-text-fill: white; -fx-padding: 2 5; -fx-background-radius: 3; -fx-font-weight: bold;";
@@ -185,13 +192,22 @@ public class VueBureau implements Observateur {
                     labelPriorite.setStyle(stylePriorite + "-fx-background-color: #008000;");
                 }
 
+                Label lDate = new Label("dta deb" + sub.getJDebut());
+                lDate.setStyle("-fx-text-fill: #999999; -fx-font-size: 10px;");
+                lDate.setUserData(sub);
+
                 Button btnSup = new Button("Archiver");
                 btnSup.setStyle(
                         "-fx-font-size: 9px; -fx-text-fill: white; -fx-background-color: #e67e22; -fx-padding: 2 6; -fx-background-radius: 4;");
                 btnSup.setUserData(sub);
                 boutonsInteractifs.add(btnSup);
 
+                // ligne avec tous les éléments
+                HBox ligne = new HBox(5);
+                ligne.setAlignment(Pos.CENTER_LEFT);
                 ligne.getChildren().addAll(lTitre, labelPriorite, btnSup, lDate);
+
+                // bouton "+" si composite
                 if (sub.estComposite()) {
                     Button btnAdd = new Button("+");
                     btnAdd.setText("+");
@@ -200,9 +216,14 @@ public class VueBureau implements Observateur {
                     boutonsInteractifs.add(btnAdd);
                     ligne.getChildren().add(btnAdd);
                 }
+
                 boxSousTache.getChildren().add(ligne);
-                afficherSousTachesRecursif(sub, boxSousTache);
+
+                // ajouter la sous-tâche au conteneur parent
                 conteneurParent.getChildren().add(boxSousTache);
+
+                // appel récursif pour les sous-sous-tâches (avec niveau+1)
+                afficherSousTachesRecursif(sub, conteneurParent, niveau + 1);
             }
         }
     }

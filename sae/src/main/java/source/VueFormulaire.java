@@ -3,19 +3,43 @@ package source;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.Modality;
 
 public class VueFormulaire {
 
     /**
+     * Affiche une alerte d'erreur
+     * @param message le message d'erreur
+     * @param titre le titre de la fenêtre
+     */
+    public static void afficherAlerteErreur(String message, String titre) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titre);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.showAndWait();
+    }
+
+    /**
+     * Affiche une alerte d'information
+     * @param message le message
+     * @param titre le titre de la fenêtre
+     */
+    public static void afficherAlerteInformation(String message, String titre) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titre);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.showAndWait();
+    }
+
+    /**
      * Méthode pour afficher le formulaire de création de tâche
-     * 
      * @param controleur le controller
      */
     public static void afficherFormulaireCreation(Controller controleur) {
@@ -51,6 +75,7 @@ public class VueFormulaire {
                         comboPriorite.getValue());
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
+                VueFormulaire.afficherAlerteErreur(ex.getMessage(), "Erreur de création");
                 System.err.println(ex.getMessage());
             }
         });
@@ -69,8 +94,7 @@ public class VueFormulaire {
 
     /**
      * Méthode pour afficher le formulaire de modification de tâche
-     * 
-     * @param t          la tâche à modifiée
+     * @param t la tâche à modifiée
      * @param controleur le controlleur
      */
     public static void afficherFormulaireModification(Tache t, Controller controleur) {
@@ -84,7 +108,7 @@ public class VueFormulaire {
         javafx.collections.ObservableList<String> optionsPriorite = javafx.collections.FXCollections
                 .observableArrayList("Basse", "Moyenne", "Importante");
         ComboBox<String> comboPriorite = new ComboBox<>(optionsPriorite);
-        comboPriorite.setValue(t.getPriorite()); //
+        comboPriorite.setValue(t.getPriorite());
 
         Button btnSave = new Button("Sauvegarder");
 
@@ -93,6 +117,7 @@ public class VueFormulaire {
                 controleur.modifierTache(t, txtTitre.getText(), txtDesc.getText(), comboPriorite.getValue());
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
+                VueFormulaire.afficherAlerteErreur(ex.getMessage(), "Erreur de modification");
                 System.err.println(ex.getMessage());
             }
         });
@@ -109,8 +134,7 @@ public class VueFormulaire {
 
     /**
      * Méthode pour la création de sous-tâche
-     * 
-     * @param parent     la tâche parente
+     * @param parent la tâche parente
      * @param controleur le controller
      */
     public static void afficherFormulaireSousTache(Tache parent, Controller controleur) {
@@ -145,6 +169,7 @@ public class VueFormulaire {
                         comboPriorite.getValue());
                 fenetre.close();
             } catch (IllegalArgumentException ex) {
+                VueFormulaire.afficherAlerteErreur(ex.getMessage(), "Erreur d'ajout de sous-tâche");
                 System.err.println(ex.getMessage());
             }
         });

@@ -1,15 +1,9 @@
 package source;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import java.util.*;
 
 public class VueListe implements Observateur {
     private TacheManager modele;
@@ -51,6 +45,10 @@ public class VueListe implements Observateur {
         return cartesTaches;
     }
 
+    public VBox getContenuPrincipal() {
+        return contenuPrincipal;
+    }
+
     @Override
     public void actualiser() {
         // réinitialiser -> supprime tout l'ancien contenu
@@ -66,8 +64,8 @@ public class VueListe implements Observateur {
             // ajouter les tâches pour ce jour
             boolean hasTaches = false;
             for (Tache tache : modele.getTaches()) {
-                if (jour.equals(tache.getJDebut()) && !"archive".equals(tache.getEtat())) { // vérifie si la tâche
-                                                                                            // commence ce jour
+                // AJOUT: Filtrer les archives (de leur version)
+                if (jour.equals(tache.getJDebut()) && !"archive".equals(tache.getEtat())) {
                     hasTaches = true;
                     VBox carte = creerCarteTache(tache);
                     cartesTaches.add(carte);
@@ -75,9 +73,7 @@ public class VueListe implements Observateur {
 
                     // ajouter les sous-tâches si composite
                     if (tache.estComposite()) {
-                        for (Tache sousTache : tache.getSousTaches()) {
-                            afficherSousTachesRecursif(tache, sectionJour, 1);
-                        }
+                        afficherSousTachesRecursif(tache, sectionJour, 1);
                     }
                 }
             }
@@ -106,6 +102,7 @@ public class VueListe implements Observateur {
     private VBox creerSectionJour(String jour) {
         VBox section = new VBox(8);
         section.setPadding(new Insets(5));
+        section.setUserData(jour); // Stocker le jour dans la section (VOTRE VERSION)
 
         // titre du jour
         Label titreJour = new Label(jour);
@@ -120,12 +117,14 @@ public class VueListe implements Observateur {
     private VBox creerCarteTache(Tache tache) {
         VBox carte = new VBox(5);
         carte.setPadding(new Insets(8));
-        carte.setStyle("-fx-background-color: white; " +
+        String styleOrigine = "-fx-background-color: white; " +
                 "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 3, 0, 0, 1); " +
                 "-fx-border-radius: 4; -fx-background-radius: 4; " +
-                "-fx-border-color: #e0e0e0; -fx-border-width: 1;");
+                "-fx-border-color: #e0e0e0; -fx-border-width: 1;";
+        carte.setStyle(styleOrigine);
 
         carte.setUserData(tache); // stocke la tâche dans la carte pour la retrouver
+        carte.getProperties().put("style_origine", styleOrigine);
 
         // titre avec indicateur d'état
         Label titre = new Label(tache.getTitre());
@@ -169,11 +168,11 @@ public class VueListe implements Observateur {
             boutons.getChildren().add(btnSousTache);
         }
 
-        Button btnSupprimer = new Button("Archiver");
-        btnSupprimer.setUserData(tache);
-        btnSupprimer.setStyle("-fx-font-size: 11px; -fx-padding: 3 8; -fx-text-fill: #e67e22; -fx-font-weight: bold;");
-        boutonsInteractifs.add(btnSupprimer);
-        boutons.getChildren().add(btnSupprimer);
+        Button btnArchiver = new Button("Archiver");
+        btnArchiver.setUserData(tache);
+        btnArchiver.setStyle("-fx-font-size: 11px; -fx-padding: 3 8; -fx-text-fill: #e67e22; -fx-font-weight: bold;");
+        boutonsInteractifs.add(btnArchiver);
+        boutons.getChildren().add(btnArchiver);
 
         carte.getChildren().addAll(titre, description, infoBox, boutons);
         return carte;
@@ -183,9 +182,12 @@ public class VueListe implements Observateur {
     private VBox creerCarteSousTache(Tache sousTache, int niveau) {
         VBox carte = new VBox(3);
         carte.setUserData(sousTache);
-        carte.setPadding(new Insets(5, 5, 5, 25 * niveau)); // Indentation plus marquée
-        carte.setStyle("-fx-background-color: #f8f8f8; " +
-                "-fx-border-radius: 3; -fx-background-radius: 3;");
+
+        carte.setPadding(new Insets(5, 5, 5, 25 * niveau)); // Indentation progressive
+        String styleOrigine = "-fx-background-color: #f8f8f8; " +
+                "-fx-border-radius: 3; -fx-background-radius: 3;";
+        carte.setStyle(styleOrigine);
+        carte.getProperties().put("style_origine", styleOrigine);
 
         HBox ligneTitre = new HBox(5);
 
@@ -193,7 +195,6 @@ public class VueListe implements Observateur {
         point.setStyle("-fx-text-fill: #777777; -fx-font-size: 12px;");
 
         Label titre = new Label(sousTache.getTitre());
-        titre.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px; -fx-font-weight: bold;");
 
         if ("Importante".equals(sousTache.getPriorite())) {
             titre.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 11px; -fx-font-weight: bold;");
@@ -273,11 +274,14 @@ public class VueListe implements Observateur {
             return;
 
         for (Tache sousTache : parent.getSousTaches()) {
+            // filtrer les archives (de leur version)
             if (!"archive".equals(sousTache.getEtat())) {
                 VBox carteSousTache = creerCarteSousTache(sousTache, niveau);
                 cartesTaches.add(carteSousTache);
                 conteneur.getChildren().add(carteSousTache);
+
                 if (sousTache.estComposite()) {
+                    // appel récursif avec niveau augmenté
                     afficherSousTachesRecursif(sousTache, conteneur, niveau + 1);
                 }
             }

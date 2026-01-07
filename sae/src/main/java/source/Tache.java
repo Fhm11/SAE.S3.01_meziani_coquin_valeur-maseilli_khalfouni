@@ -122,4 +122,20 @@ public abstract class Tache implements Serializable {
     public String getPriorite() { return priorite; }
 
     public void setPriorite(String priorite) { this.priorite = priorite; }
+
+    public boolean contientTache(Tache tacheRecherche) {
+        if (this == tacheRecherche) {
+            return true;
+        }
+
+        if (this.estComposite()) {
+            for (Tache sousTache : this.getSousTaches()) {
+                if (sousTache.contientTache(tacheRecherche)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }
