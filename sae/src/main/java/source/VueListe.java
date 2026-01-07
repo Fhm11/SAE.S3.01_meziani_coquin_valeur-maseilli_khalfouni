@@ -1,9 +1,15 @@
 package source;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import java.util.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 public class VueListe implements Observateur {
     private TacheManager modele;
@@ -60,8 +66,9 @@ public class VueListe implements Observateur {
             // ajouter les tâches pour ce jour
             boolean hasTaches = false;
             for (Tache tache : modele.getTaches()) {
-                if (jour.equals(tache.getJDebut())) { // vérifie si la tâche commence ce jour
-                        hasTaches = true;
+                if (jour.equals(tache.getJDebut()) && !"archive".equals(tache.getEtat())) { // vérifie si la tâche
+                                                                                            // commence ce jour
+                    hasTaches = true;
                     VBox carte = creerCarteTache(tache);
                     cartesTaches.add(carte);
                     sectionJour.getChildren().add(carte);
@@ -153,9 +160,9 @@ public class VueListe implements Observateur {
             boutons.getChildren().add(btnSousTache);
         }
 
-        Button btnSupprimer = new Button("Supprimer");
+        Button btnSupprimer = new Button("Archiver");
         btnSupprimer.setUserData(tache);
-        btnSupprimer.setStyle("-fx-font-size: 11px; -fx-padding: 3 8; -fx-text-fill: #cc0000;");
+        btnSupprimer.setStyle("-fx-font-size: 11px; -fx-padding: 3 8; -fx-text-fill: #e67e22; -fx-font-weight: bold;");
         boutonsInteractifs.add(btnSupprimer);
         boutons.getChildren().add(btnSupprimer);
 
@@ -179,7 +186,12 @@ public class VueListe implements Observateur {
         Label titre = new Label(sousTache.getTitre());
         titre.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px; -fx-font-weight: bold;");
 
-        ligneTitre.getChildren().addAll(point, titre);
+        Button btnArchiver = new Button("Archiver");
+        btnArchiver.setStyle(
+                "-fx-font-size: 9px; -fx-text-fill: white; -fx-background-color: #e67e22; -fx-padding: 2 6; -fx-background-radius: 4;");
+        boutonsInteractifs.add(btnArchiver);
+
+        ligneTitre.getChildren().addAll(point, titre, btnArchiver);
 
         // bouton "+" si la sous-tâche elle-même est composite
         if (sousTache.estComposite()) {
@@ -243,11 +255,13 @@ public class VueListe implements Observateur {
             return;
 
         for (Tache sousTache : parent.getSousTaches()) {
-            VBox carteSousTache = creerCarteSousTache(sousTache, niveau);
-            cartesTaches.add(carteSousTache);
-            conteneur.getChildren().add(carteSousTache);
-            if (sousTache.estComposite()) {
-                afficherSousTachesRecursif(sousTache, conteneur, niveau + 1);
+            if (!"archive".equals(sousTache.getEtat())) {
+                VBox carteSousTache = creerCarteSousTache(sousTache, niveau);
+                cartesTaches.add(carteSousTache);
+                conteneur.getChildren().add(carteSousTache);
+                if (sousTache.estComposite()) {
+                    afficherSousTachesRecursif(sousTache, conteneur, niveau + 1);
+                }
             }
         }
     }

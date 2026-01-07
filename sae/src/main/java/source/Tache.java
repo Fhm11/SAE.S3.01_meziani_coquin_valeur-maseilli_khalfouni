@@ -13,6 +13,7 @@ public abstract class Tache implements Serializable {
     private String etat = "afaire";
     private String jDebut;
     private String jFin;
+    private String ancienEtat;
 
     /**
      * Constructeur créant une tâche
@@ -107,5 +108,13 @@ public abstract class Tache implements Serializable {
 
     public void setEtat(String nouvelEtat) {
         this.etat = nouvelEtat;
+    }
+
+    public String getAncienEtat() {
+        return ancienEtat;
+    }
+
+    public void setAncienEtat(String ancienEtat) {
+        this.ancienEtat = ancienEtat;
     }
 }

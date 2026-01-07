@@ -27,10 +27,20 @@ public class Controller implements EventHandler<ActionEvent> {
 
             if (data instanceof Tache) {
                 Tache t = (Tache) data;
-
-                if ("Supprimer".equals(btn.getText())) {
+                String texte = btn.getText();
+                if ("Archiver".equals(texte)) {
+                    modele.archiverTache(t);
+                }
+                else if ("Restaurer".equals(texte)) {
+                    modele.restaurerTache(t);
+                }
+                else if ("supprimer".equals(texte)) {
                     modele.supprimerTache(t);
-                } else if ("+".equals(btn.getText())) {
+                }
+                else if ("Supprimer".equals(texte)) {
+                    modele.supprimerTache(t);
+                }
+                else if ("+".equals(texte)) {
                     VueFormulaire.afficherFormulaireSousTache(t, this);
                 }
             }

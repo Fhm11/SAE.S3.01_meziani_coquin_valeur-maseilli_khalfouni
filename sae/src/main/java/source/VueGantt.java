@@ -1,17 +1,23 @@
 package source;
 
-import javafx.scene.layout.*;
-import javafx.scene.control.*;
+import java.util.Arrays;
+import java.util.List;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import java.util.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 
 public class VueGantt implements Observateur {
 
     private ScrollPane sp;
     private GridPane gp;
     private TacheManager modele;
-    private List<String> JOURS_REF = Arrays.asList("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche");
+    private List<String> JOURS_REF = Arrays.asList("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi",
+            "Dimanche");
 
     public VueGantt(TacheManager modele) {
         this.modele = modele;
@@ -42,12 +48,14 @@ public class VueGantt implements Observateur {
         for (int i = 0; i <= maxOffset; i++) {
             gp.getColumnConstraints().add(new ColumnConstraints(120));
             String nomJour = JOURS_REF.get(i % 7);
-            if (i >= 7) nomJour += " (semaine suivante)";
+            if (i >= 7)
+                nomJour += " (semaine suivante)";
 
             Label lbl = new Label(nomJour);
             lbl.setMaxWidth(Double.MAX_VALUE);
             lbl.setAlignment(Pos.CENTER);
-            lbl.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 10; -fx-background-color: #f8f9fa; -fx-border-color: #999; -fx-border-width: 0 0 2 2;");
+            lbl.setStyle(
+                    "-fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 10; -fx-background-color: #f8f9fa; -fx-border-color: #999; -fx-border-width: 0 0 2 2;");
             gp.add(lbl, i + 1, 0);
         }
 
@@ -96,9 +104,12 @@ public class VueGantt implements Observateur {
         String baseStyle = "-fx-text-fill: white; -fx-padding: 8; -fx-background-radius: 5; -fx-font-size: 13px; -fx-font-weight: bold; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);";
 
         String color;
-        if (niveau == 0) color = "#3498db";
-        else if (niveau == 1) color = "#5dade2";
-        else color = "#aed6f1";
+        if (niveau == 0)
+            color = "#3498db";
+        else if (niveau == 1)
+            color = "#5dade2";
+        else
+            color = "#aed6f1";
 
         barre.setStyle("-fx-background-color: " + color + "; " + baseStyle);
         barre.setMaxWidth(Double.MAX_VALUE);

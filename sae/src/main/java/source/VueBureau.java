@@ -1,12 +1,16 @@
 package source;
 
-import javafx.geometry.Pos;
-import javafx.scene.input.MouseButton;
-import javafx.scene.layout.*;
-import javafx.scene.control.*;
-import javafx.geometry.Insets;
 import java.util.ArrayList;
 import java.util.List;
+
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 public class VueBureau implements Observateur {
     private VBox root;
@@ -80,7 +84,8 @@ public class VueBureau implements Observateur {
     private VBox creerAffichageTache(Tache t) {
         VBox conteneur = new VBox(5);
         conteneur.setPadding(new Insets(10));
-        conteneur.setStyle("-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1); -fx-background-radius: 5;");
+        conteneur.setStyle(
+                "-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1); -fx-background-radius: 5;");
         conteneur.setUserData(t);
         Label labelTitre = new Label(t.getTitre());
         labelTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
@@ -104,12 +109,13 @@ public class VueBureau implements Observateur {
             boutons.getChildren().add(btnAjouterSous);
         }
 
-        Button btnSupprimer = new Button("Supprimer");
+        Button btnSupprimer = new Button("Archiver");
+        btnSupprimer.setStyle("-fx-text-fill: white; -fx-background-color: #e67e22; -fx-font-weight: bold;");
         btnSupprimer.setUserData(t);
         boutonsInteractifs.add(btnSupprimer);
         boutons.getChildren().add(btnSupprimer);
 
-        conteneur.getChildren().addAll(labelTitre, labelDesc, boutons,labelDate);
+        conteneur.getChildren().addAll(labelTitre, labelDesc, boutons, labelDate);
 
         if (t.estComposite()) {
             afficherSousTachesRecursif(t, conteneur);
@@ -130,7 +136,8 @@ public class VueBureau implements Observateur {
         lblTitre.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(lblTitre, Priority.ALWAYS);
         Button btnSupCol = new Button("X");
-        btnSupCol.setStyle("-fx-text-fill: white; -fx-background-color: #ff4444; -fx-font-size: 10px; -fx-font-weight: bold;");
+        btnSupCol.setStyle(
+                "-fx-text-fill: white; -fx-background-color: #ff4444; -fx-font-size: 10px; -fx-font-weight: bold;");
         btnSupCol.setUserData(titre);
         boutonsInteractifs.add(btnSupCol);
         header.getChildren().addAll(lblTitre, btnSupCol);
@@ -139,37 +146,41 @@ public class VueBureau implements Observateur {
     }
 
     private void afficherSousTachesRecursif(Tache parent, VBox conteneurParent) {
-        if (!parent.estComposite()) return;
+        if (!parent.estComposite())
+            return;
         for (Tache sub : parent.getSousTaches()) {
-            VBox boxSousTache = new VBox(2);
-            boxSousTache.setPadding(new Insets(2, 0, 2, 20));
-            boxSousTache.setStyle("-fx-border-color: #eeeeee; -fx-border-width: 0 0 0 2;");
-            boxSousTache.setUserData(sub);
-            cartesTaches.add(boxSousTache);
-            HBox ligne = new HBox(5);
-            ligne.setAlignment(Pos.CENTER_LEFT);
-            Label lTitre = new Label("• " + sub.getTitre());
-            lTitre.setStyle("-fx-text-fill: #333333; -fx-font-size: 11px; -fx-font-weight: bold;");
-            Label lDate = new Label("dta deb" + sub.getJDebut() );
-            lDate.setStyle("-fx-text-fill: #999999; -fx-font-size: 10px;");
-            Button btnSup = new Button("X");
-            btnSup.setStyle("-fx-font-size: 9px; -fx-text-fill: red; -fx-font-weight: bold; -fx-background-color: transparent;");
-            btnSup.setText("Supprimer");
-            btnSup.setStyle("-fx-font-size: 9px; -fx-text-fill: red;");
-            btnSup.setUserData(sub);
-            boutonsInteractifs.add(btnSup);
-            ligne.getChildren().addAll(lTitre, btnSup,lDate);
-            if (sub.estComposite()) {
-                Button btnAdd = new Button("+");
-                btnAdd.setText("+");
-                btnAdd.setStyle("-fx-font-size: 9px; -fx-text-fill: blue;");
-                btnAdd.setUserData(sub);
-                boutonsInteractifs.add(btnAdd);
-                ligne.getChildren().add(btnAdd);
+            if (!"archive".equals(sub.getEtat())) {
+                VBox boxSousTache = new VBox(2);
+                boxSousTache.setPadding(new Insets(2, 0, 2, 20));
+                boxSousTache.setStyle("-fx-border-color: #eeeeee; -fx-border-width: 0 0 0 2;");
+                boxSousTache.setUserData(sub);
+                cartesTaches.add(boxSousTache);
+                HBox ligne = new HBox(5);
+                ligne.setAlignment(Pos.CENTER_LEFT);
+                Label lTitre = new Label("• " + sub.getTitre());
+                lTitre.setStyle("-fx-text-fill: #333333; -fx-font-size: 11px; -fx-font-weight: bold;");
+                Label lDate = new Label("dta deb" + sub.getJDebut());
+                lDate.setStyle("-fx-text-fill: #999999; -fx-font-size: 10px;");
+
+                Button btnSup = new Button("Archiver");
+                btnSup.setStyle(
+                        "-fx-font-size: 9px; -fx-text-fill: white; -fx-background-color: #e67e22; -fx-padding: 2 6; -fx-background-radius: 4;");
+                btnSup.setUserData(sub);
+                boutonsInteractifs.add(btnSup);
+
+                ligne.getChildren().addAll(lTitre, btnSup, lDate);
+                if (sub.estComposite()) {
+                    Button btnAdd = new Button("+");
+                    btnAdd.setText("+");
+                    btnAdd.setStyle("-fx-font-size: 9px; -fx-text-fill: blue;");
+                    btnAdd.setUserData(sub);
+                    boutonsInteractifs.add(btnAdd);
+                    ligne.getChildren().add(btnAdd);
+                }
+                boxSousTache.getChildren().add(ligne);
+                afficherSousTachesRecursif(sub, boxSousTache);
+                conteneurParent.getChildren().add(boxSousTache);
             }
-            boxSousTache.getChildren().add(ligne);
-            afficherSousTachesRecursif(sub, boxSousTache);
-            conteneurParent.getChildren().add(boxSousTache);
         }
     }
 }

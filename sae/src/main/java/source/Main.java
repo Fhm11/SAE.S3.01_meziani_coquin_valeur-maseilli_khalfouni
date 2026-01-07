@@ -19,6 +19,7 @@ public class Main extends Application {
     private VueBureau vueBureau;
     private VueListe vueListe;
     private VueGantt vueGantt;
+    private VueArchive vueArchive;
     private Controller controleur;
     private TacheManager modele;
     private ComboBox<String> comboVue;
@@ -31,6 +32,7 @@ public class Main extends Application {
         vueBureau = new VueBureau(modele);
         vueListe = new VueListe(modele);
         vueGantt = new VueGantt(modele);
+        vueArchive = new VueArchive(modele);
 
         controleur = new Controller(modele);
 
@@ -38,6 +40,7 @@ public class Main extends Application {
         modele.ajouterObservateur(vueBureau);
         modele.ajouterObservateur(vueListe);
         modele.ajouterObservateur(vueGantt);
+        modele.ajouterObservateur(vueArchive);
 
         // crée le conteneur principal avec BorderPane
         rootPrincipal = new BorderPane();
@@ -53,6 +56,7 @@ public class Main extends Application {
         configurerHandlersColonnes(vueBureau, controleur);
         vueBureau.actualiser();
         vueListe.actualiser();
+        vueArchive.actualiser();
         configurerHandlersPourVueActive();
 
         // observer pour reconfigurer les handlers quand la vue est actualisée
@@ -105,7 +109,7 @@ public class Main extends Application {
         labelVue.setStyle("-fx-font-weight: bold; -fx-padding: 0 5 0 0;");
 
         comboVue = new ComboBox<>();
-        comboVue.getItems().addAll("Vue Bureau", "Vue Liste par Jour", "Vue Gantt");
+        comboVue.getItems().addAll("Vue Bureau", "Vue Liste par Jour", "Vue Gantt", "Vue Archive");
         comboVue.setValue("Vue Bureau");
         comboVue.setStyle("-fx-font-size: 14px;");
 
@@ -133,6 +137,11 @@ public class Main extends Application {
                 rootPrincipal.setCenter(vueGantt.getRoot());
                 vueGantt.actualiser();
                 break;
+                case "Vue Archive":
+                    rootPrincipal.setCenter(vueArchive.getRoot());
+                    vueArchive.actualiser();
+                    configurerHandlersArchive(vueArchive, controleur);
+                    break;
             case "Vue Bureau":
             default:
                 rootPrincipal.setCenter(vueBureau.getRoot());
@@ -150,6 +159,8 @@ public class Main extends Application {
             configurerBoutonsSuppressionColonne(vueBureau, controleur);
         } else if (rootPrincipal.getCenter() == vueListe.getRoot()) {
             configurerHandlersCartesListe(vueListe, controleur); // réattache les handlers
+        }else if (rootPrincipal.getCenter() == vueArchive.getRoot()) {
+            configurerHandlersArchive(vueArchive, controleur);
         }
     }
 
@@ -244,6 +255,12 @@ public class Main extends Application {
                 String nomColonne = (String) data;
                 btn.setOnAction(e -> controleur.supprimerColonne(nomColonne));
             }
+        }
+    }
+
+    private void configurerHandlersArchive(VueArchive vue, Controller controleur) {
+        for (Button btn : vue.getBoutonsInteractifs()) {
+            btn.setOnAction(controleur);
         }
     }
 

@@ -298,4 +298,33 @@ public class TacheManager implements Sujet {
         }
         return idxCible - idxDep;
     }
+
+    /**
+     * Archive une tâche (ne la supprime pas, change juste son état)
+     * @param t la tâche à archiver
+     */
+    public void archiverTache(Tache t) {
+        if (t != null) {
+            t.setAncienEtat(t.getEtat());
+            t.setEtat("archive");
+            notifierObservateur();
+            sauvegarder();
+        }
+    }
+
+    /**
+     * Restaure une tâche archivée vers son état d'origine
+     * @param t la tâche à restaurer
+     */
+    public void restaurerTache(Tache t) {
+        if (t != null) {
+            if (t.getAncienEtat() != null) {
+                t.setEtat(t.getAncienEtat());
+            } else {
+                t.setEtat("À faire");
+            }
+            notifierObservateur();
+            sauvegarder();
+        }
+    }
 }
