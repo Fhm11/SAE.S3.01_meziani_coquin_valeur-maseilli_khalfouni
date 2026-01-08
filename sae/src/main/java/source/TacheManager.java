@@ -2,29 +2,43 @@ package source;
 
 import java.util.ArrayList;
 import java.io.*;
-import java.io.File;
 import java.util.*;
 
+/**
+ * Gestionnaire principal des tâches (Modèle dans MVC, Singleton)
+ * Gère la liste des tâches, les colonnes, la sauvegarde et les observateurs
+ */
 public class TacheManager implements Sujet {
+
+    // Instance unique (Singleton)
     private static TacheManager instance;
+
+    // Listes de données
     private ArrayList<Observateur> observateurs;
     private ArrayList<Tache> listeTaches;
-    private static final String FICHIER_SAUVEGARDE = "taches.sauvegarde";
-    private static final String FICHIER_COLONNES = "colonnes.sauvegarde";
     private ArrayList<String> colonnes;
 
+    // Fichiers de sauvegarde
+    private static final String FICHIER_SAUVEGARDE = "taches.sauvegarde";
+    private static final String FICHIER_COLONNES = "colonnes.sauvegarde";
+
+    // Liste des jours de la semaine pour les calculs
+    private static final List<String> JOURS_REFERENCE = Arrays.asList(
+            "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"
+    );
+
     /**
-     * Le constructeur pour créer le modele
+     * Constructeur privé (Singleton)
      */
     private TacheManager() {
         observateurs = new ArrayList<>();
-        charger();
+        chargerTaches();
         chargerColonnes();
     }
 
     /**
-     * Méthode pour retourner l'instance de Singleton
-     * @return l'instance
+     * Récupère l'instance unique du gestionnaire (Singleton)
+     * @return l'instance de TacheManager
      */
     public static synchronized TacheManager getInstance() {
         if (instance == null) {
@@ -33,15 +47,20 @@ public class TacheManager implements Sujet {
         return instance;
     }
 
+    /**
+     * Récupère la liste des colonnes disponibles
+     * @return la liste des noms de colonnes
+     */
     public ArrayList<String> getColonnes() {
         return colonnes;
     }
 
+    // === Méthodes de sauvegarde et chargement ===
+
     /**
-     * Méthode pour charger les données au démarrage
-     * de l'application
+     * Charge les tâches depuis le fichier de sauvegarde
      */
-    private void charger() {
+    private void chargerTaches() {
         File fichier = new File(FICHIER_SAUVEGARDE);
         if (fichier.exists()) {
             try (ObjectInputStream ois = new ObjectInputStream(
@@ -58,141 +77,213 @@ public class TacheManager implements Sujet {
     }
 
     /**
-     * Méthode pour sauvegarder les données à chaque modification
-     * de l'application
+     * Sauvegarde les tâches dans le fichier
      */
-    private void sauvegarder() {
+    private void sauvegarderTaches() {
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(FICHIER_SAUVEGARDE))) {
             oos.writeObject(listeTaches);
         } catch (IOException e) {
             System.err.println("Erreur lors de la sauvegarde : " + e.getMessage());
-            VueFormulaire.afficherAlerteErreur("Erreur lors de la sauvegarde : " + e.getMessage(), "Erreur de sauvegarde");
+            VueFormulaire.afficherAlerteErreur("Erreur lors de la sauvegarde : " + e.getMessage(),
+                    "Erreur de sauvegarde");
         }
     }
 
     /**
-     * Méthode pour créer une tâche simple
-     * @param titre le titre
-     * @param description la description
+     * Initialise les colonnes par défaut
      */
-    public void creerTacheSimple(String titre, String description, String debut, String fin, String prio) {
-        if (titre == null || titre.trim().isEmpty()) {
-            VueFormulaire.afficherAlerteErreur("Le titre est obligatoire", "Erreur de création");
-            throw new IllegalArgumentException("titre obligatoire");
-        }
-        Tache t = TacheFactory.creerTacheSimple(titre, description, debut, fin, prio);
-        if (!colonnes.isEmpty()) {
-            t.setEtat(colonnes.get(0));
-        }
-        listeTaches.add(t);
-        notifierObservateur();
-        sauvegarder();
+    private void initialiserColonnesDefaut() {
+        colonnes = new ArrayList<>();
+        colonnes.add("afaire");
+        colonnes.add("encours");
+        colonnes.add("terminer");
     }
 
     /**
-     * Méthode pour créer une tâche composite
-     * @param titre son titre
+     * Charge les colonnes depuis le fichier
+     */
+    private void chargerColonnes() {
+        File fichier = new File(FICHIER_COLONNES);
+        if (fichier.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichier))) {
+                colonnes = (ArrayList<String>) ois.readObject();
+            } catch (Exception e) {
+                initialiserColonnesDefaut();
+            }
+        } else {
+            initialiserColonnesDefaut();
+        }
+    }
+
+    /**
+     * Sauvegarde les colonnes dans le fichier
+     */
+    private void sauvegarderColonnes() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FICHIER_COLONNES))) {
+            oos.writeObject(colonnes);
+        } catch (IOException e) {
+            System.err.println("Erreur lors de la sauvegarde des colonnes : " + e.getMessage());
+            VueFormulaire.afficherAlerteErreur("Erreur lors de la sauvegarde des colonnes : " + e.getMessage(),
+                    "Erreur de sauvegarde");
+        }
+    }
+
+    // === Méthodes de gestion des tâches ===
+
+    /**
+     * Crée une tâche simple
+     * @param titre le titre de la tâche
      * @param description sa description
+     * @param debut le jour de début
+     * @param fin le jour de fin
+     * @param priorite la priorité
      */
-    public void creerTacheComposite(String titre, String description, String debut, String fin, String prio) {
+    public void creerTacheSimple(String titre, String description,
+                                 String debut, String fin, String priorite) {
         if (titre == null || titre.trim().isEmpty()) {
             VueFormulaire.afficherAlerteErreur("Le titre est obligatoire", "Erreur de création");
-            throw new IllegalArgumentException("titre obligatoire");
+            throw new IllegalArgumentException("Le titre est obligatoire");
         }
-        Tache t = TacheFactory.creerTacheComposite(titre, description, debut, fin, prio);
+        Tache tache = TacheFactory.creerTacheSimple(titre, description, debut, fin, priorite);
+        // Place la tâche dans la première colonne par défaut
         if (!colonnes.isEmpty()) {
-            t.setEtat(colonnes.get(0));
+            tache.setEtat(colonnes.get(0));
         }
-        listeTaches.add(t);
+        listeTaches.add(tache);
         notifierObservateur();
-        sauvegarder();
+        sauvegarderTaches();
     }
 
     /**
-     * Méthode pour modifier une tâche
-     * @param t la tâche à modifier
-     * @param titre son nouveau titre
-     * @param description sa nouvelle description
+     * Crée une tâche composite
+     * @param titre le titre de la tâche
+     * @param description sa description
+     * @param debut le jour de début
+     * @param fin le jour de fin
+     * @param priorite la priorité
      */
-    public void modifierTache(Tache t, String titre, String description, String prio) {
+    public void creerTacheComposite(String titre, String description,
+                                    String debut, String fin, String priorite) {
+        if (titre == null || titre.trim().isEmpty()) {
+            VueFormulaire.afficherAlerteErreur("Le titre est obligatoire", "Erreur de création");
+            throw new IllegalArgumentException("Le titre est obligatoire");
+        }
+        Tache tache = TacheFactory.creerTacheComposite(titre, description, debut, fin, priorite);
+        if (!colonnes.isEmpty()) {
+            tache.setEtat(colonnes.get(0));
+        }
+        listeTaches.add(tache);
+        notifierObservateur();
+        sauvegarderTaches();
+    }
+
+    /**
+     * Modifie une tâche existante
+     * @param t la tâche à modifier
+     * @param titre le nouveau titre
+     * @param description la nouvelle description
+     * @param priorite la nouvelle priorité
+     */
+    public void modifierTache(Tache t, String titre, String description, String priorite) {
         if (t == null || titre == null || titre.trim().isEmpty()) {
             VueFormulaire.afficherAlerteErreur("Paramètres invalides", "Erreur de modification");
             throw new IllegalArgumentException("Paramètres invalides");
         }
         t.setTitre(titre);
         t.setDescription(description);
+        t.setPriorite(priorite);
         notifierObservateur();
-        sauvegarder();
+        sauvegarderTaches();
     }
 
     /**
-     * Méthode pour ajouter une sous-tâche
-     * @param parent la tâche parente
-     * @param titre son titre
+     * Ajoute une sous-tâche à une tâche parente
+     * @param parent la tâche parente (doit être composite)
+     * @param titre le titre de la sous-tâche
      * @param description sa description
+     * @param estComposite true si la sous-tâche est composite
+     * @param debut le jour de début
+     * @param fin le jour de fin
+     * @param priorite la priorité
      */
-    public void ajouterSousTache(Tache parent, String titre, String description, boolean estComposite, String debut, String fin, String prio) {
+    public void ajouterSousTache(Tache parent, String titre, String description,
+                                 boolean estComposite, String debut, String fin, String priorite) {
         if (parent == null || !parent.estComposite() ||
                 titre == null || titre.trim().isEmpty()) {
             VueFormulaire.afficherAlerteErreur("Impossible d'ajouter une sous-tâche", "Erreur d'ajout");
             throw new IllegalArgumentException("Impossible d'ajouter une sous-tâche");
         }
 
+        // Vérifie que la sous-tâche est dans l'intervalle du parent
         if (!estIntervalleValide(parent, debut, fin)) {
-            String message = "La sous-tâche doit être comprise entre " + parent.getJDebut() + " et " + parent.getJFin();
+            String message = "La sous-tâche doit être comprise entre " +
+                    parent.getJDebut() + " et " + parent.getJFin();
             VueFormulaire.afficherAlerteErreur(message, "Erreur d'intervalle");
             throw new IllegalArgumentException(message);
         }
 
+        // Crée la sous-tâche
         Tache sousTache;
         if (estComposite) {
-            sousTache = TacheFactory.creerTacheComposite(titre, description, debut, fin, prio);
+            sousTache = TacheFactory.creerTacheComposite(titre, description, debut, fin, priorite);
         } else {
-            sousTache = TacheFactory.creerTacheSimple(titre, description, debut, fin, prio);
+            sousTache = TacheFactory.creerTacheSimple(titre, description, debut, fin, priorite);
         }
+
+        sousTache.setEtat(parent.getEtat());
+
+        // Ajoute au parent
         TacheComposite composite = (TacheComposite) parent;
         composite.ajouterSousTache(sousTache);
+
         notifierObservateur();
-        sauvegarder();
+        sauvegarderTaches();
     }
 
     /**
-     * Méthode pour supprimer une tâche
+     * Supprime une tâche (principale ou sous-tâche)
      * @param t la tâche à supprimer
      */
     public void supprimerTache(Tache t) {
         if (t == null) return;
 
-        // essayer de supprimer des tâches principales
+        // Essayer de supprimer des tâches principales
         if (listeTaches.remove(t)) {
             notifierObservateur();
-            sauvegarder();
+            sauvegarderTaches();
             return;
         }
 
-        // chercher récursivement dans toutes les tâches composites
+        // Chercher récursivement dans toutes les tâches composites
         for (Tache tache : listeTaches) {
             if (supprimerSousTacheRecursif(tache, t)) {
                 notifierObservateur();
-                sauvegarder();
+                sauvegarderTaches();
                 return;
             }
         }
-        // si on arrive ici, la tâche n'a pas été trouvée
+
+        // Si on arrive ici, la tâche n'a pas été trouvée
         VueFormulaire.afficherAlerteErreur("Tâche non trouvée", "Erreur de suppression");
     }
 
+    /**
+     * Supprime récursivement une sous-tâche
+     * @param parent la tâche parente où chercher
+     * @param aSupprimer la tâche à supprimer
+     * @return true si la tâche a été supprimée
+     */
     private boolean supprimerSousTacheRecursif(Tache parent, Tache aSupprimer) {
         if (parent.estComposite()) {
             TacheComposite composite = (TacheComposite) parent;
 
-            // chercher directement dans les sous-tâches
+            // Chercher directement dans les sous-tâches
             if (composite.retirerSousTache(aSupprimer)) {
                 return true;
             }
 
-            // chercher récursivement dans les sous-sous-tâches
+            // Chercher récursivement dans les sous-sous-tâches
             for (Tache sousTache : composite.getSousTaches()) {
                 if (supprimerSousTacheRecursif(sousTache, aSupprimer)) {
                     return true;
@@ -202,59 +293,14 @@ public class TacheManager implements Sujet {
         return false;
     }
 
-    /**
-     * Méthode pour ajouter les observateurs
-     * @param o l'observateur à ajouter
-     */
-    @Override
-    public void ajouterObservateur(Observateur o) {
-        if (o != null && !observateurs.contains(o)) {
-            observateurs.add(o);
-        }
-    }
+    // === Méthodes de gestion des colonnes ===
 
     /**
-     * Méthodes pour supprimer les observateurs
-     * @param o l'observateur à supp
+     * Ajoute une nouvelle colonne
+     * @param titre le nom de la colonne
      */
-    @Override
-    public void supprimerObservateur(Observateur o) {
-        observateurs.remove(o);
-    }
-
-    /**
-     * Méthodes pour notifier les observateurs
-     */
-    @Override
-    public void notifierObservateur() {
-        for (Observateur o : observateurs) {
-            o.actualiser();
-        }
-    }
-
-    /**
-     * Getter pour voir les tâches
-     * @return les tâches
-     */
-    public ArrayList<Tache> getTaches() {
-        return listeTaches;
-    }
-
-    /**
-     * Méthode pour le drag and drop
-     * @param t la tâche à déplacer
-     * @param nouvelEtat la colonne ou la tâche est placée
-     */
-    public void deplacerTache(Tache t, String nouvelEtat) {
-        if (t != null && nouvelEtat != null) {
-            t.setEtat(nouvelEtat);
-            notifierObservateur();
-            sauvegarder();
-        }
-    }
-
     public void ajouterColonne(String titre) {
-        // vérifier si la colonne existe déjà
+        // Vérifie si la colonne existe déjà
         if (colonnes.contains(titre)) {
             VueFormulaire.afficherAlerteErreur("Une colonne avec ce nom existe déjà", "Erreur de création");
             return;
@@ -265,8 +311,13 @@ public class TacheManager implements Sujet {
         sauvegarderColonnes();
     }
 
+    /**
+     * Supprime une colonne et toutes ses tâches
+     * @param titre le nom de la colonne à supprimer
+     */
     public void supprimerColonne(String titre) {
         if (colonnes.remove(titre)) {
+            // Supprime toutes les tâches de cette colonne
             ArrayList<Tache> aSupprimer = new ArrayList<>();
             for (Tache t : listeTaches) {
                 if (t.getEtat().equals(titre)) {
@@ -277,62 +328,27 @@ public class TacheManager implements Sujet {
 
             notifierObservateur();
             sauvegarderColonnes();
-            sauvegarder();
+            sauvegarderTaches();
         }
     }
 
-    private void chargerColonnes() {
-        File fichier = new File(FICHIER_COLONNES);
-        if (fichier.exists()) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichier))) {
-                colonnes = (ArrayList<String>) ois.readObject();
-            } catch (Exception e) {
-                initColonnesDefaut();
-            }
-        } else {
-            initColonnesDefaut();
+    // === Méthodes de déplacement ===
+
+    /**
+     * Déplace une tâche vers une nouvelle colonne (changement d'état)
+     * @param t la tâche à déplacer
+     * @param nouvelEtat le nouvel état/colonne
+     */
+    public void deplacerTache(Tache t, String nouvelEtat) {
+        if (t != null && nouvelEtat != null) {
+            t.setEtat(nouvelEtat);
+            notifierObservateur();
+            sauvegarderTaches();
         }
-    }
-
-    private void initColonnesDefaut() {
-        colonnes = new ArrayList<>();
-        colonnes.add("À faire");
-        colonnes.add("En cours");
-        colonnes.add("Terminée");
-    }
-
-    private void sauvegarderColonnes() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FICHIER_COLONNES))) {
-            oos.writeObject(colonnes);
-        } catch (IOException e) {
-            System.err.println("Erreur lors de la sauvegarde des colonnes : " + e.getMessage());
-            VueFormulaire.afficherAlerteErreur("Erreur lors de la sauvegarde des colonnes : " + e.getMessage(), "Erreur de sauvegarde");
-        }
-    }
-
-    private boolean estIntervalleValide(Tache parent, String debutEnfant, String finEnfant) {
-        int dureeParent = calculerDistance(parent.getJFin(), parent.getJDebut());
-
-        int posDebutEnfant = calculerDistance(debutEnfant, parent.getJDebut());
-
-        int posFinEnfant = calculerDistance(finEnfant, parent.getJDebut());
-
-        return posDebutEnfant <= dureeParent && posFinEnfant <= dureeParent && posDebutEnfant <= posFinEnfant;
-    }
-
-    private int calculerDistance(String jourCible, String jourDepart) {
-        List<String> joursRef = Arrays.asList("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche");
-        int idxDep = joursRef.indexOf(jourDepart);
-        int idxCible = joursRef.indexOf(jourCible);
-
-        if (idxCible < idxDep) {
-            return idxCible + 7 - idxDep;
-        }
-        return idxCible - idxDep;
     }
 
     /**
-     * AJOUT: Archive une tâche (ne la supprime pas, change juste son état)
+     * Archive une tâche (la met dans l'état "archive")
      * @param t la tâche à archiver
      */
     public void archiverTache(Tache t) {
@@ -340,12 +356,12 @@ public class TacheManager implements Sujet {
             t.setAncienEtat(t.getEtat());
             t.setEtat("archive");
             notifierObservateur();
-            sauvegarder();
+            sauvegarderTaches();
         }
     }
 
     /**
-     * AJOUT: Restaure une tâche archivée vers son état d'origine
+     * Restaure une tâche archivée vers son état d'origine
      * @param t la tâche à restaurer
      */
     public void restaurerTache(Tache t) {
@@ -356,41 +372,51 @@ public class TacheManager implements Sujet {
                 t.setEtat("À faire");
             }
             notifierObservateur();
-            sauvegarder();
+            sauvegarderTaches();
         }
     }
 
+    // === Méthodes de gestion de la hiérarchie (sous-tâches) ===
+
+    /**
+     * Fait d'une tâche une sous-tâche d'une autre
+     * @param enfant la tâche à devenir sous-tâche
+     * @param nouveauParent la nouvelle tâche parente
+     */
     public void devenirSousTacheDe(Tache enfant, Tache nouveauParent) {
-        // vérifications de base
+        // Vérifications de base
         if (enfant == null || nouveauParent == null) {
             VueFormulaire.afficherAlerteErreur("Tâche invalide", "Erreur de parentage");
             return;
         }
 
         if (enfant == nouveauParent) {
-            VueFormulaire.afficherAlerteErreur("Une tâche ne peut pas être sous-tâche d'elle-même", "Erreur de parentage");
+            VueFormulaire.afficherAlerteErreur("Une tâche ne peut pas être sous-tâche d'elle-même",
+                    "Erreur de parentage");
             return;
         }
 
         if (!nouveauParent.estComposite()) {
-            VueFormulaire.afficherAlerteErreur("La tâche parente ne peut pas recevoir de sous-tâches", "Erreur de parentage");
+            VueFormulaire.afficherAlerteErreur("La tâche parente ne peut pas recevoir de sous-tâches",
+                    "Erreur de parentage");
             return;
         }
 
-        // vérifier les cycles (l'enfant ne doit pas contenir le parent)
+        // Vérifie les cycles (l'enfant ne doit pas contenir le parent)
         if (enfant.contientTache(nouveauParent)) {
-            VueFormulaire.afficherAlerteErreur("Erreur : Cycle détecté - l'enfant contient déjà le parent", "Erreur de parentage");
+            VueFormulaire.afficherAlerteErreur("Erreur : Cycle détecté - l'enfant contient déjà le parent",
+                    "Erreur de parentage");
             return;
         }
 
-        // retirer l'enfant de son ancienne position
+        // Retire l'enfant de son ancienne position
         boolean retire = false;
 
-        // chercher dans les tâches principales
+        // Chercher dans les tâches principales
         if (listeTaches.remove(enfant)) {
             retire = true;
         } else {
-            // chercher récursivement dans les sous-tâches
+            // Chercher récursivement dans les sous-tâches
             for (Tache tache : listeTaches) {
                 if (retirerSousTacheRecursif(tache, enfant)) {
                     retire = true;
@@ -399,44 +425,64 @@ public class TacheManager implements Sujet {
             }
         }
 
-        // ajouter au nouveau parent
+        // Ajoute au nouveau parent
         if (retire) {
             TacheComposite parentComposite = (TacheComposite) nouveauParent;
             parentComposite.ajouterSousTache(enfant);
 
-            // ajuster les jours si nécessaire (la sous-tâche doit être dans l'intervalle du parent)
+            // Ajuste les jours si nécessaire
             ajusterJoursPourSousTache(enfant, nouveauParent);
 
             notifierObservateur();
-            sauvegarder();
+            sauvegarderTaches();
         }
+    }
+
+    /**
+     * Vérifie si une tâche est une sous-tâche
+     * @param tache la tâche à vérifier
+     * @return true si c'est une sous-tâche, false si c'est une tâche principale
+     */
+    public boolean estSousTache(Tache tache) {
+        // Si la tâche est dans la liste principale, ce n'est pas une sous-tâche
+        if (listeTaches.contains(tache)) {
+            return false;
+        }
+
+        // Sinon, chercher dans toutes les tâches composites
+        for (Tache tachePrincipale : listeTaches) {
+            if (tachePrincipale.contientTache(tache)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * Ajuste les jours d'une sous-tâche pour qu'elle soit dans l'intervalle du parent
      */
     private void ajusterJoursPourSousTache(Tache enfant, Tache parent) {
-        // si les jours de l'enfant sont en dehors de l'intervalle du parent, les ajuster
         if (!estIntervalleValide(parent, enfant.getJDebut(), enfant.getJFin())) {
-            // par défaut, mettre les mêmes jours que le parent
+            // Par défaut, mettre les mêmes jours que le parent
             enfant.setJDebut(parent.getJDebut());
             enfant.setJFin(parent.getJFin());
         }
     }
 
     /**
-     * Cherche et retire une sous-tâche récursivement
+     * Retire une sous-tâche récursivement
      */
     private boolean retirerSousTacheRecursif(Tache parent, Tache aRetirer) {
         if (parent.estComposite()) {
             TacheComposite composite = (TacheComposite) parent;
 
-            // chercher directement
+            // Chercher directement
             if (composite.retirerSousTache(aRetirer)) {
                 return true;
             }
 
-            // chercher récursivement
+            // Chercher récursivement
             for (Tache sousTache : composite.getSousTaches()) {
                 if (retirerSousTacheRecursif(sousTache, aRetirer)) {
                     return true;
@@ -446,55 +492,97 @@ public class TacheManager implements Sujet {
         return false;
     }
 
+    // === Méthodes d'extraction (rendre une sous-tâche principale) ===
+
     /**
-     * Extraire une sous-tâche pour en faire une tâche principale
+     * Extrait une sous-tâche pour en faire une tâche principale
+     * @param sousTache la sous-tâche à extraire
      */
     public void extraireSousTache(Tache sousTache) {
-        // trouver et retirer de son parent
+        // Trouver et retirer de son parent
         Tache parent = trouverParent(sousTache);
         if (parent != null && parent.estComposite()) {
             TacheComposite parentComposite = (TacheComposite) parent;
             parentComposite.retirerSousTache(sousTache);
 
-            // ajouter aux tâches principales
+            // Ajouter aux tâches principales
             listeTaches.add(sousTache);
             notifierObservateur();
-            sauvegarder();
+            sauvegarderTaches();
         } else {
-            VueFormulaire.afficherAlerteErreur("Impossible d'extraire la sous-tâche", "Erreur d'extraction");
+            VueFormulaire.afficherAlerteErreur("Impossible d'extraire la sous-tâche",
+                    "Erreur d'extraction");
         }
     }
 
     /**
-     * Extraire une sous-tâche vers une colonne spécifique
-     * CORRECTION : Vérifier et retirer correctement de l'ancien parent
+     * Extrait une sous-tâche vers une colonne spécifique
+     * @param sousTache la sous-tâche à extraire
+     * @param etat la colonne de destination
      */
     public void extraireVersColonne(Tache sousTache, String etat) {
         if (sousTache == null || etat == null) return;
 
-        // retirer de n'importe où dans la hiérarchie
+        // Retirer de n'importe où dans la hiérarchie
         retirerDeTouteHierarchie(sousTache);
 
-        // ajouter aux principales si nécessaire
+        // Ajouter aux principales si nécessaire
         if (!listeTaches.contains(sousTache)) {
             listeTaches.add(sousTache);
         }
 
-        // changer état
+        // Changer état
         sousTache.setEtat(etat);
 
-        // sauvegarder et notifier
+        // Sauvegarder et notifier
         notifierObservateur();
-        sauvegarder();
+        sauvegarderTaches();
     }
 
+    /**
+     * Extrait une sous-tâche vers un jour spécifique
+     * @param sousTache la sous-tâche à extraire
+     * @param jour le jour de destination
+     */
+    public void extraireVersJour(Tache sousTache, String jour) {
+        if (sousTache == null || jour == null) {
+            VueFormulaire.afficherAlerteErreur("Paramètres invalides", "Erreur d'extraction");
+            return;
+        }
+
+        // Retirer de n'importe où dans la hiérarchie
+        retirerDeTouteHierarchie(sousTache);
+
+        // Si la sous-tâche n'est pas déjà dans listeTaches, l'ajouter
+        if (!listeTaches.contains(sousTache)) {
+            listeTaches.add(sousTache);
+        }
+
+        // Changer le jour
+        sousTache.setJDebut(jour);
+
+        // Ajuster également la date de fin pour conserver la même durée
+        int duree = calculerDistance(sousTache.getJFin(), sousTache.getJDebut());
+        String nouvelleFin = calculerJourSuivant(jour, duree);
+        sousTache.setJFin(nouvelleFin);
+
+        // Notifier et sauvegarder
+        notifierObservateur();
+        sauvegarderTaches();
+    }
+
+    // === Méthodes utilitaires pour la hiérarchie ===
+
+    /**
+     * Retire une tâche de toute la hiérarchie
+     */
     private void retirerDeTouteHierarchie(Tache aRetirer) {
-        // d'abord essayer dans les tâches principales
+        // D'abord essayer dans les tâches principales
         if (listeTaches.remove(aRetirer)) {
             return;
         }
 
-        // sinon chercher récursivement
+        // Sinon chercher récursivement
         for (Tache tache : listeTaches) {
             if (retirerRecursifDeHierarchie(tache, aRetirer)) {
                 return;
@@ -506,12 +594,12 @@ public class TacheManager implements Sujet {
         if (parent.estComposite()) {
             TacheComposite composite = (TacheComposite) parent;
 
-            // essayer de retirer directement
+            // Essayer de retirer directement
             if (composite.retirerSousTache(aRetirer)) {
                 return true;
             }
 
-            // chercher récursivement dans les enfants
+            // Chercher récursivement dans les enfants
             for (Tache sousTache : composite.getSousTaches()) {
                 if (retirerRecursifDeHierarchie(sousTache, aRetirer)) {
                     return true;
@@ -522,74 +610,10 @@ public class TacheManager implements Sujet {
     }
 
     /**
-     * Extraire une sous-tâche vers un jour spécifique
-     * CORRECTION : Vérifier et retirer correctement de l'ancien parent
-     */
-    public void extraireVersJour(Tache sousTache, String jour) {
-        if (sousTache == null || jour == null) {
-            VueFormulaire.afficherAlerteErreur("Paramètres invalides", "Erreur d'extraction");
-            return;
-        }
-
-        // retirer de n'importe où dans la hiérarchie
-        retirerDeTouteHierarchie(sousTache);
-
-        // si la sous-tâche n'est pas déjà dans listeTaches, l'ajouter
-        if (!listeTaches.contains(sousTache)) {
-            listeTaches.add(sousTache);
-        }
-
-        // changer le jour
-        sousTache.setJDebut(jour);
-
-        // ajuster également la date de fin pour conserver la même durée
-        int duree = calculerDistance(sousTache.getJFin(), sousTache.getJDebut());
-        String nouvelleFin = calculerJourSuivant(jour, duree);
-        sousTache.setJFin(nouvelleFin);
-
-        // notifier et sauvegarder
-        notifierObservateur();
-        sauvegarder();
-    }
-
-    /**
-     * Déplace une tâche vers un nouveau jour en ajustant automatiquement la date de fin
-     */
-    public void deplacerTacheVersJour(Tache t, String nouveauJour) {
-        if (t == null || nouveauJour == null) {
-            VueFormulaire.afficherAlerteErreur("Paramètres invalides", "Erreur de déplacement");
-            return;
-        }
-
-        // calculer la durée actuelle
-        int duree = calculerDistance(t.getJFin(), t.getJDebut());
-
-        // changer le jour de début
-        t.setJDebut(nouveauJour);
-
-        // calculer le nouveau jour de fin en conservant la même durée
-        String nouveauJFin = calculerJourSuivant(nouveauJour, duree);
-        t.setJFin(nouveauJFin);
-
-        notifierObservateur();
-        sauvegarder();
-    }
-
-    /**
-     * Calcule le jour suivant après un certain nombre de jours
-     */
-    private String calculerJourSuivant(String jourDepart, int nbJours) {
-        List<String> joursRef = Arrays.asList("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche");
-        int idx = joursRef.indexOf(jourDepart);
-        int nouvelIdx = (idx + nbJours) % 7;
-        return joursRef.get(nouvelIdx);
-    }
-
-    /**
      * Trouve le parent d'une sous-tâche
      */
     private Tache trouverParent(Tache enfant) {
-        // chercher dans les tâches principales
+        // Chercher dans les tâches principales
         for (Tache tache : listeTaches) {
             if (trouverParentRecursif(tache, enfant)) {
                 return tache;
@@ -601,11 +625,11 @@ public class TacheManager implements Sujet {
     private boolean trouverParentRecursif(Tache parent, Tache enfant) {
         if (parent.estComposite()) {
             TacheComposite composite = (TacheComposite) parent;
-            // vérifier directement
+            // Vérifier directement
             if (composite.getSousTaches().contains(enfant)) {
                 return true;
             }
-            // chercher récursivement
+            // Chercher récursivement
             for (Tache sousTache : composite.getSousTaches()) {
                 if (trouverParentRecursif(sousTache, enfant)) {
                     return true;
@@ -613,5 +637,82 @@ public class TacheManager implements Sujet {
             }
         }
         return false;
+    }
+
+    // === Méthodes utilitaires pour les dates ===
+
+    /**
+     * Vérifie si un intervalle de dates est valide par rapport au parent
+     */
+    private boolean estIntervalleValide(Tache parent, String debutEnfant, String finEnfant) {
+        int dureeParent = calculerDistance(parent.getJFin(), parent.getJDebut());
+        int posDebutEnfant = calculerDistance(debutEnfant, parent.getJDebut());
+        int posFinEnfant = calculerDistance(finEnfant, parent.getJDebut());
+
+        return posDebutEnfant <= dureeParent &&
+                posFinEnfant <= dureeParent &&
+                posDebutEnfant <= posFinEnfant;
+    }
+
+    /**
+     * Calcule la distance entre deux jours
+     */
+    private int calculerDistance(String jourCible, String jourDepart) {
+        int idxDep = JOURS_REFERENCE.indexOf(jourDepart);
+        int idxCible = JOURS_REFERENCE.indexOf(jourCible);
+
+        if (idxCible < idxDep) {
+            return idxCible + 7 - idxDep;
+        }
+        return idxCible - idxDep;
+    }
+
+    /**
+     * Calcule le jour suivant après un certain nombre de jours
+     */
+    private String calculerJourSuivant(String jourDepart, int nbJours) {
+        int idx = JOURS_REFERENCE.indexOf(jourDepart);
+        int nouvelIdx = (idx + nbJours) % 7;
+        return JOURS_REFERENCE.get(nouvelIdx);
+    }
+
+    // === Méthodes du patron Observateur ===
+
+    /**
+     * Ajoute un observateur
+     * @param o l'observateur à ajouter
+     */
+    @Override
+    public void ajouterObservateur(Observateur o) {
+        if (o != null && !observateurs.contains(o)) {
+            observateurs.add(o);
+        }
+    }
+
+    /**
+     * Supprime un observateur
+     * @param o l'observateur à supprimer
+     */
+    @Override
+    public void supprimerObservateur(Observateur o) {
+        observateurs.remove(o);
+    }
+
+    /**
+     * Notifie tous les observateurs d'un changement
+     */
+    @Override
+    public void notifierObservateur() {
+        for (Observateur o : observateurs) {
+            o.actualiser();
+        }
+    }
+
+    /**
+     * Récupère la liste des tâches principales
+     * @return la liste des tâches
+     */
+    public ArrayList<Tache> getTaches() {
+        return listeTaches;
     }
 }

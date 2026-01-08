@@ -7,224 +7,365 @@ import javafx.geometry.Insets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Vue Bureau (vue Kanban/Trello)
+ * Affiche les tâches organisées en colonnes
+ */
 public class VueBureau implements Observateur {
-    private VBox root;
+
+    // Composants graphiques principaux
+    private VBox racine;
     private TacheManager modele;
     private HBox conteneurColonnes;
+    private ScrollPane panneauDefilement;
+
+    // Listes pour stocker les éléments graphiques
     private List<VBox> colonnesGraphiques = new ArrayList<>();
     private List<Button> boutonsInteractifs = new ArrayList<>();
     private List<VBox> cartesTaches = new ArrayList<>();
     private List<HBox> sousTachesBoxes = new ArrayList<>();
 
+    public VueBureau() {}
+
+    /**
+     * Constructeur de la vue Bureau
+     * @param modele le gestionnaire de tâches
+     */
     public VueBureau(TacheManager modele) {
         this.modele = modele;
-        root = new VBox(10);
-        root.setPadding(new Insets(10));
+        initialiserInterface();
+    }
 
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
+    /**
+     * Initialise l'interface graphique
+     */
+    private void initialiserInterface() {
+        racine = new VBox(10);
+        racine.setPadding(new Insets(10));
 
+        // Crée un panneau de défilement pour les colonnes
+        panneauDefilement = new ScrollPane();
+        panneauDefilement.setFitToHeight(true);
+        panneauDefilement.setFitToWidth(true);
+
+        // Crée le conteneur pour les colonnes
         conteneurColonnes = new HBox(15);
         conteneurColonnes.setPadding(new Insets(10));
 
-        scrollPane.setContent(conteneurColonnes);
-        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+        // Place le conteneur dans le panneau de défilement
+        panneauDefilement.setContent(conteneurColonnes);
 
-        root.getChildren().addAll(scrollPane);
+        // Fait prendre tout l'espace disponible au panneau
+        VBox.setVgrow(panneauDefilement, Priority.ALWAYS);
+
+        // Ajoute le panneau à la racine
+        racine.getChildren().addAll(panneauDefilement);
     }
 
-    public VBox getRoot() {
-        return root;
+    /**
+     * Récupère la racine de la vue (pour l'ajouter à la scène)
+     * @return le conteneur racine
+     */
+    public VBox getRacine() {
+        return racine;
     }
 
+    /**
+     * Récupère la liste des boutons interactifs
+     * @return la liste des boutons
+     */
     public List<Button> getBoutonsInteractifs() {
         return boutonsInteractifs;
     }
 
+    /**
+     * Récupère la liste des cartes de tâches
+     * @return la liste des cartes
+     */
     public List<VBox> getCartesTaches() {
         return cartesTaches;
     }
 
+    /**
+     * Récupère la liste des boîtes de sous-tâches
+     * @return la liste des boîtes
+     */
     public List<HBox> getSousTachesBoxes() {
         return sousTachesBoxes;
     }
 
+    /**
+     * Récupère la liste des colonnes graphiques
+     * @return la liste des colonnes
+     */
     public List<VBox> getColonnesGraphiques() {
         return colonnesGraphiques;
     }
 
+    /**
+     * Récupère le conteneur des colonnes
+     * @return le conteneur HBox
+     */
     public HBox getConteneurColonnes() {
         return conteneurColonnes;
     }
 
+    /**
+     * Actualise l'affichage de la vue (patron Observateur)
+     */
     @Override
     public void actualiser() {
+        // Nettoie les anciens éléments
         conteneurColonnes.getChildren().clear();
         colonnesGraphiques.clear();
         boutonsInteractifs.clear();
         cartesTaches.clear();
         sousTachesBoxes.clear();
 
+        // Crée une colonne pour chaque état/colonne
         for (String nomColonne : modele.getColonnes()) {
-            VBox colBox = creerColonne(nomColonne);
-            colonnesGraphiques.add(colBox);
-            for (Tache t : modele.getTaches()) {
-                if (nomColonne.equals(t.getEtat())) {
-                    VBox carte = creerAffichageTache(t);
+            VBox colonneBox = creerColonne(nomColonne);
+            colonnesGraphiques.add(colonneBox);
+
+            // Ajoute les tâches de cette colonne
+            for (Tache tache : modele.getTaches()) {
+                if (nomColonne.equals(tache.getEtat())) {
+                    VBox carte = creerAffichageTache(tache);
                     cartesTaches.add(carte);
-                    colBox.getChildren().add(carte);
+                    colonneBox.getChildren().add(carte);
                 }
             }
-            conteneurColonnes.getChildren().add(colBox);
+
+            // Ajoute la colonne au conteneur
+            conteneurColonnes.getChildren().add(colonneBox);
         }
     }
 
-    private VBox creerAffichageTache(Tache t) {
+    /**
+     * Crée l'affichage graphique d'une tâche
+     * @param tache la tâche à afficher
+     * @return le conteneur VBox de la carte
+     */
+    private VBox creerAffichageTache(Tache tache) {
         VBox conteneur = new VBox(5);
         conteneur.setPadding(new Insets(10));
-        String styleOrigine = "-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1); -fx-background-radius: 5;";
+
+        // Style de base de la carte
+        String styleOrigine = "-fx-background-color: white; " +
+                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1); " +
+                "-fx-background-radius: 5;";
+
+        // Stocke le style original pour le restaurer plus tard
         conteneur.getProperties().put("style_origine", styleOrigine);
         conteneur.setStyle(styleOrigine);
-        conteneur.setUserData(t);
 
-        Label labelTitre = new Label(t.getTitre());
+        // Stocke la tâche dans le conteneur
+        conteneur.setUserData(tache);
+
+        // ===== TITRE DE LA TÂCHE =====
+        Label labelTitre = new Label(tache.getTitre());
         labelTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
 
-        Label labelPriorite = new Label(t.getPriorite().toUpperCase());
-        String stylePriorite = "-fx-font-size: 9px; -fx-text-fill: white; -fx-padding: 2 5; -fx-background-radius: 3; -fx-font-weight: bold;";
+        // ===== INDICATEUR DE PRIORITÉ =====
+        Label labelPriorite = new Label(tache.getPriorite().toUpperCase());
+        String stylePriorite = "-fx-font-size: 9px; -fx-text-fill: white; " +
+                "-fx-padding: 2 5; -fx-background-radius: 3; " +
+                "-fx-font-weight: bold;";
 
-        if ("Importante".equals(t.getPriorite())) {
+        // Change la couleur selon la priorité
+        if ("Importante".equals(tache.getPriorite())) {
             labelPriorite.setStyle(stylePriorite + "-fx-background-color: #e74c3c;");
-        } else if ("Moyenne".equals(t.getPriorite())) {
+        } else if ("Moyenne".equals(tache.getPriorite())) {
             labelPriorite.setStyle(stylePriorite + "-fx-background-color: #f1c40f;");
         } else {
             labelPriorite.setStyle(stylePriorite + "-fx-background-color: #008000;");
         }
 
-        Label labelDesc = new Label(t.getDescription());
+        // ===== DESCRIPTION =====
+        Label labelDesc = new Label(tache.getDescription());
         labelDesc.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px;");
-        labelDesc.setWrapText(true);
+        labelDesc.setWrapText(true); // Retour à la ligne automatique
 
-        Label labelDate = new Label("dta deb : " + t.getJDebut());
+        // ===== DATE DE DÉBUT =====
+        Label labelDate = new Label("Date début : " + tache.getJDebut());
         labelDate.setStyle("-fx-text-fill: #888888; -fx-font-size: 10px; -fx-font-style: italic;");
 
-        conteneur.setUserData(t);
-
+        // ===== BOUTONS D'ACTION =====
         HBox boutons = new HBox(5);
         boutons.setAlignment(Pos.CENTER_RIGHT);
 
-        if (t.estComposite()) {
+        // Bouton "+" pour les tâches composites
+        if (tache.estComposite()) {
             Button btnAjouterSous = new Button("+");
-            btnAjouterSous.setUserData(t);
+            btnAjouterSous.setUserData(tache);
             boutonsInteractifs.add(btnAjouterSous);
             boutons.getChildren().add(btnAjouterSous);
         }
 
-        Button btnSupprimer = new Button("Archiver");
-        btnSupprimer.setStyle("-fx-text-fill: white; -fx-background-color: #e67e22; -fx-font-weight: bold;");
-        btnSupprimer.setUserData(t);
-        boutonsInteractifs.add(btnSupprimer);
-        boutons.getChildren().add(btnSupprimer);
+        // Bouton "Archiver"
+        Button btnArchiver = new Button("Archiver");
+        btnArchiver.setStyle("-fx-text-fill: white; -fx-background-color: #e67e22; -fx-font-weight: bold;");
+        btnArchiver.setUserData(tache);
+        boutonsInteractifs.add(btnArchiver);
+        boutons.getChildren().add(btnArchiver);
 
-        conteneur.getChildren().addAll(labelTitre, labelPriorite, labelDesc, boutons, labelDate);
+        // Ajoute tous les éléments au conteneur
+        conteneur.getChildren().addAll(
+                labelTitre,
+                labelPriorite,
+                labelDesc,
+                boutons,
+                labelDate
+        );
 
-        if (t.estComposite()) {
-            afficherSousTachesRecursif(t, conteneur, 1);
+        // Affiche les sous-tâches si la tâche est composite
+        if (tache.estComposite()) {
+            afficherSousTachesRecursif(tache, conteneur, 1);
         }
+
         return conteneur;
     }
 
+    /**
+     * Crée une colonne pour afficher les tâches d'un état particulier
+     * @param titre le nom de la colonne
+     * @return le conteneur VBox de la colonne
+     */
     private VBox creerColonne(String titre) {
-        VBox col = new VBox(10);
-        col.setPadding(new Insets(10));
-        col.setMinWidth(250);
-        String styleOrigine = "-fx-border-color: lightgray; -fx-border-width: 1; -fx-background-color: #f4f4f4;";
-        col.setStyle(styleOrigine);
-        col.getProperties().put("style_origine", styleOrigine);
-        col.setUserData(titre);
+        VBox colonne = new VBox(10);
+        colonne.setPadding(new Insets(10));
+        colonne.setMinWidth(250); // Largeur minimale
 
-        HBox header = new HBox(10);
-        header.setAlignment(Pos.CENTER_LEFT);
-        Label lblTitre = new Label(titre);
-        lblTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-        lblTitre.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(lblTitre, Priority.ALWAYS);
-        Button btnSupCol = new Button("X");
-        btnSupCol.setStyle("-fx-text-fill: white; -fx-background-color: #ff4444; -fx-font-size: 10px; -fx-font-weight: bold;");
-        btnSupCol.setUserData(titre);
-        boutonsInteractifs.add(btnSupCol);
-        header.getChildren().addAll(lblTitre, btnSupCol);
-        col.getChildren().add(header);
-        return col;
+        // Style de base de la colonne
+        String styleOrigine = STYLE_COLONNE;
+        colonne.setStyle(styleOrigine);
+        colonne.getProperties().put("style_origine", styleOrigine);
+
+        // Stocke le nom de la colonne
+        colonne.setUserData(titre);
+
+        // ===== EN-TÊTE DE LA COLONNE =====
+        HBox enTete = new HBox(10);
+        enTete.setAlignment(Pos.CENTER_LEFT);
+
+        Label labelTitre = new Label(titre);
+        labelTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        labelTitre.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(labelTitre, Priority.ALWAYS);
+
+        // Bouton pour supprimer la colonne
+        Button btnSupprimerColonne = new Button("X");
+        btnSupprimerColonne.setStyle("-fx-text-fill: white; -fx-background-color: #ff4444; " +
+                "-fx-font-size: 10px; -fx-font-weight: bold;");
+        btnSupprimerColonne.setUserData(titre);
+        boutonsInteractifs.add(btnSupprimerColonne);
+
+        enTete.getChildren().addAll(labelTitre, btnSupprimerColonne);
+        colonne.getChildren().add(enTete);
+
+        return colonne;
     }
 
+    /**
+     * Affiche récursivement les sous-tâches d'une tâche composite
+     * @param parent la tâche parente
+     * @param conteneurParent le conteneur où ajouter les sous-tâches
+     * @param niveau le niveau de profondeur (pour l'indentation)
+     */
     private void afficherSousTachesRecursif(Tache parent, VBox conteneurParent, int niveau) {
-        if (!parent.estComposite())
-            return;
-        for (Tache sub : parent.getSousTaches()) {
-            if (!"archive".equals(sub.getEtat())) {
-                HBox boxSousTache = new HBox(5);
+        if (!parent.estComposite()) return;
 
-                int decalage = 20 + (niveau * 15);
-                boxSousTache.setPadding(new Insets(2, 0, 2, decalage));
+        for (Tache sousTache : parent.getSousTaches()) {
+            // Ne pas afficher les tâches archivées
+            if (!"archive".equals(sousTache.getEtat())) {
+                HBox boiteSousTache = creerBoiteSousTache(sousTache, niveau);
 
-                // style avec bordure gauche pour montrer la hiérarchie
-                boxSousTache.setStyle("-fx-border-color: #eeeeee; -fx-border-width: 0 0 0 2;");
-                boxSousTache.setUserData(sub);
+                // Ajoute la boîte aux listes pour manipulation
+                sousTachesBoxes.add(boiteSousTache);
 
-                // ajouter aux listes pour pouvoir les manipuler
-                sousTachesBoxes.add(boxSousTache); // Pour le drag & drop
+                // Ajoute la sous-tâche au conteneur parent
+                conteneurParent.getChildren().add(boiteSousTache);
 
-                // contenu de la sous-tâche
-                Label lTitre = new Label("• " + sub.getTitre());
-                lTitre.setStyle("-fx-text-fill: #333333; -fx-font-size: 11px; -fx-font-weight: bold;");
-                lTitre.setUserData(sub);
-
-                Label labelPriorite = new Label(sub.getPriorite().toUpperCase());
-                String stylePriorite = "-fx-font-size: 9px; -fx-text-fill: white; -fx-padding: 2 5; -fx-background-radius: 3; -fx-font-weight: bold;";
-
-                if ("Importante".equals(sub.getPriorite())) {
-                    labelPriorite.setStyle(stylePriorite + "-fx-background-color: #e74c3c;");
-                } else if ("Moyenne".equals(sub.getPriorite())) {
-                    labelPriorite.setStyle(stylePriorite + "-fx-background-color: #f1c40f;");
-                } else {
-                    labelPriorite.setStyle(stylePriorite + "-fx-background-color: #008000;");
-                }
-
-                Label lDate = new Label("dta deb" + sub.getJDebut());
-                lDate.setStyle("-fx-text-fill: #999999; -fx-font-size: 10px;");
-                lDate.setUserData(sub);
-
-                Button btnSup = new Button("Archiver");
-                btnSup.setStyle(
-                        "-fx-font-size: 9px; -fx-text-fill: white; -fx-background-color: #e67e22; -fx-padding: 2 6; -fx-background-radius: 4;");
-                btnSup.setUserData(sub);
-                boutonsInteractifs.add(btnSup);
-
-                // ligne avec tous les éléments
-                HBox ligne = new HBox(5);
-                ligne.setAlignment(Pos.CENTER_LEFT);
-                ligne.getChildren().addAll(lTitre, labelPriorite, btnSup, lDate);
-
-                // bouton "+" si composite
-                if (sub.estComposite()) {
-                    Button btnAdd = new Button("+");
-                    btnAdd.setText("+");
-                    btnAdd.setStyle("-fx-font-size: 9px; -fx-text-fill: blue;");
-                    btnAdd.setUserData(sub);
-                    boutonsInteractifs.add(btnAdd);
-                    ligne.getChildren().add(btnAdd);
-                }
-
-                boxSousTache.getChildren().add(ligne);
-
-                // ajouter la sous-tâche au conteneur parent
-                conteneurParent.getChildren().add(boxSousTache);
-
-                // appel récursif pour les sous-sous-tâches (avec niveau+1)
-                afficherSousTachesRecursif(sub, conteneurParent, niveau + 1);
+                // Appel récursif pour les sous-sous-tâches
+                afficherSousTachesRecursif(sousTache, conteneurParent, niveau + 1);
             }
         }
     }
+
+    /**
+     * Crée une boîte d'affichage pour une sous-tâche
+     * @param sousTache la sous-tâche à afficher
+     * @param niveau le niveau de profondeur
+     * @return le conteneur HBox de la sous-tâche
+     */
+    private HBox creerBoiteSousTache(Tache sousTache, int niveau) {
+        HBox boite = new HBox(5);
+
+        // Calcule le décalage selon le niveau
+        int decalage = 20 + (niveau * 15);
+        boite.setPadding(new Insets(2, 0, 2, decalage));
+
+        // Style avec bordure gauche pour montrer la hiérarchie
+        boite.setStyle("-fx-border-color: #eeeeee; -fx-border-width: 0 0 0 2;");
+
+        // Stocke la tâche dans la boîte
+        boite.setUserData(sousTache);
+
+        // ===== CONTENU DE LA SOUS-TÂCHE =====
+        HBox ligne = new HBox(5);
+        ligne.setAlignment(Pos.CENTER_LEFT);
+
+        // Titre avec puce
+        Label labelTitre = new Label("• " + sousTache.getTitre());
+        labelTitre.setStyle("-fx-text-fill: #333333; -fx-font-size: 11px; -fx-font-weight: bold;");
+        labelTitre.setUserData(sousTache);
+
+        // Indicateur de priorité
+        Label labelPriorite = new Label(sousTache.getPriorite().toUpperCase());
+        String stylePriorite = "-fx-font-size: 9px; -fx-text-fill: white; " +
+                "-fx-padding: 2 5; -fx-background-radius: 3; " +
+                "-fx-font-weight: bold;";
+
+        if ("Importante".equals(sousTache.getPriorite())) {
+            labelPriorite.setStyle(stylePriorite + "-fx-background-color: #e74c3c;");
+        } else if ("Moyenne".equals(sousTache.getPriorite())) {
+            labelPriorite.setStyle(stylePriorite + "-fx-background-color: #f1c40f;");
+        } else {
+            labelPriorite.setStyle(stylePriorite + "-fx-background-color: #008000;");
+        }
+
+        // Bouton "Archiver"
+        Button btnArchiver = new Button("Archiver");
+        btnArchiver.setStyle("-fx-font-size: 9px; -fx-text-fill: white; " +
+                "-fx-background-color: #e67e22; -fx-padding: 2 6; " +
+                "-fx-background-radius: 4;");
+        btnArchiver.setUserData(sousTache);
+        boutonsInteractifs.add(btnArchiver);
+
+        // Date de début
+        Label labelDate = new Label("déb : " + sousTache.getJDebut());
+        labelDate.setStyle("-fx-text-fill: #999999; -fx-font-size: 10px;");
+        labelDate.setUserData(sousTache);
+
+        // Bouton "+" si la sous-tâche est composite
+        if (sousTache.estComposite()) {
+            Button btnAjouter = new Button("+");
+            btnAjouter.setStyle("-fx-font-size: 9px; -fx-text-fill: blue;");
+            btnAjouter.setUserData(sousTache);
+            boutonsInteractifs.add(btnAjouter);
+            ligne.getChildren().add(btnAjouter);
+        }
+
+        // Ajoute tous les éléments à la ligne
+        ligne.getChildren().addAll(labelTitre, labelPriorite, btnArchiver, labelDate);
+
+        // Ajoute la ligne à la boîte
+        boite.getChildren().add(ligne);
+
+        return boite;
+    }
+
+    // Constante de style pour les colonnes (utilisée aussi dans GestionnaireVues)
+    private static final String STYLE_COLONNE =
+            "-fx-border-color: lightgray; -fx-border-width: 1; -fx-background-color: #f4f4f4;";
 }
