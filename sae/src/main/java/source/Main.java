@@ -15,10 +15,20 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     private BorderPane racinePrincipale;
-    private CoordinateurVues coordinateurVues;
     private Controller controleur;
     private TacheManager modele;
     private ComboBox<String> selecteurVue;
+
+    // Références directes aux vues (remplacent CoordinateurVues)
+    private VueBureau vueBureau;
+    private VueListe vueListe;
+    private VueGantt vueGantt;
+    private VueArchive vueArchive;
+
+    // Contrôleurs spécialisés pour chaque vue
+    private ControllerBureau controleurBureau;
+    private ControllerListe controleurListe;
+    private ControllerArchive controleurArchive;
 
     @Override
     public void start(Stage fenetrePrincipale) {
@@ -43,18 +53,30 @@ public class Main extends Application {
         // Crée le conteneur principal
         racinePrincipale = new BorderPane();
 
-        // Crée le coordinateur de vues
-        coordinateurVues = new CoordinateurVues(racinePrincipale, controleur);
+        // Crée toutes les vues directement
+        vueBureau = new VueBureau(modele);
+        vueListe = new VueListe(modele);
+        vueGantt = new VueGantt(modele);
+        vueArchive = new VueArchive(modele);
 
-        // Initialise toutes les vues avec le modèle
-        coordinateurVues.initialiserVues(modele);
+        // Crée les contrôleurs spécialisés
+        controleurBureau = new ControllerBureau(controleur);
+        controleurListe = new ControllerListe(controleur);
+        controleurArchive = new ControllerArchive(controleur);
+
+        // Initialise chaque vue
+        vueBureau.actualiser();
+        vueListe.actualiser();
+        vueGantt.actualiser();
+        vueArchive.actualiser();
 
         // Crée et place la barre d'outils
         HBox barreOutils = creerBarreOutils();
         racinePrincipale.setTop(barreOutils);
 
         // Affiche la vue Bureau par défaut
-        coordinateurVues.changerVue("Vue Bureau");
+        racinePrincipale.setCenter(vueBureau.getRacine());
+        controleurBureau.configurerVue(vueBureau);
 
         // Configure la scène et la fenêtre
         Scene scene = new Scene(racinePrincipale, 1200, 800);
@@ -72,21 +94,25 @@ public class Main extends Application {
         barreOutils.setPadding(new Insets(10));
         barreOutils.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #ddd; -fx-border-width: 0 0 1 0;");
 
+        // ===== BOUTON NOUVELLE TÂCHE =====
         Button btnNouvelleTache = new Button("Nouvelle Tâche");
         btnNouvelleTache.setStyle("-fx-font-size: 14px; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 8 15;");
         btnNouvelleTache.setOnAction(evenement -> {
             VueFormulaire.afficherFormulaireCreation(controleur);
         });
 
+        // ===== BOUTON CRÉER COLONNE =====
         Button btnNouvelleColonne = new Button("Créer Colonne");
         btnNouvelleColonne.setStyle("-fx-font-size: 14px; -fx-padding: 8 15;");
         btnNouvelleColonne.setOnAction(evenement -> {
             afficherDialogueCreationColonne();
         });
 
+        // ===== SÉPARATEUR =====
         Separator separateur = new Separator();
         separateur.setOrientation(javafx.geometry.Orientation.VERTICAL);
 
+        // ===== SÉLECTEUR DE VUE =====
         Label labelVue = new Label("Vue :");
         labelVue.setStyle("-fx-font-weight: bold; -fx-padding: 0 5 0 0;");
 
@@ -98,9 +124,11 @@ public class Main extends Application {
             changerVue();
         });
 
+        // ===== ESPACEUR POUR ALIGNER À GAUCHE =====
         Pane espaceur = new Pane();
         HBox.setHgrow(espaceur, Priority.ALWAYS);
 
+        // Ajoute tous les composants à la barre d'outils
         barreOutils.getChildren().addAll(
                 btnNouvelleTache,
                 btnNouvelleColonne,
@@ -122,8 +150,10 @@ public class Main extends Application {
         dialogue.setHeaderText(null);
         dialogue.setContentText("Entrez le nom :");
 
+        // Attend la saisie de l'utilisateur
         String nom = dialogue.showAndWait().orElse(null);
 
+        // Crée la colonne si le nom n'est pas vide
         if (nom != null && !nom.trim().isEmpty()) {
             controleur.ajouterColonne(nom);
         }
@@ -134,24 +164,49 @@ public class Main extends Application {
      */
     private void changerVue() {
         String vueSelectionnee = selecteurVue.getValue();
-        coordinateurVues.changerVue(vueSelectionnee);
+
+        switch(vueSelectionnee) {
+            case "Vue Liste par Jour":
+                racinePrincipale.setCenter(vueListe.getRacine());
+                controleurListe.configurerVue(vueListe);
+                break;
+
+            case "Vue Gantt":
+                racinePrincipale.setCenter(vueGantt.getRacine());
+                vueGantt.actualiser();
+                break;
+
+            case "Vue Archive":
+                racinePrincipale.setCenter(vueArchive.getRacine());
+                vueArchive.actualiser();
+                controleurArchive.configurerVue(vueArchive);
+                break;
+
+            case "Vue Bureau":
+            default:
+                racinePrincipale.setCenter(vueBureau.getRacine());
+                controleurBureau.configurerVue(vueBureau);
+                break;
+        }
     }
 
     /**
      * Configure les observateurs pour les mises à jour automatiques
      */
     private void configurerObservateurs() {
-        modele.ajouterObservateur(coordinateurVues.getVueBureau());
-        modele.ajouterObservateur(coordinateurVues.getVueListe());
-        modele.ajouterObservateur(coordinateurVues.getVueGantt());
-        modele.ajouterObservateur(coordinateurVues.getVueArchive());
+        // Enregistre toutes les vues comme observatrices
+        modele.ajouterObservateur(vueBureau);
+        modele.ajouterObservateur(vueListe);
+        modele.ajouterObservateur(vueGantt);
+        modele.ajouterObservateur(vueArchive);
 
+        // Observateur pour reconfigurer après mise à jour
         modele.ajouterObservateur(new Observateur() {
             @Override
             public void actualiser() {
                 javafx.application.Platform.runLater(() -> {
-                    String vueCourante = selecteurVue.getValue();
-                    coordinateurVues.changerVue(vueCourante);
+                    // Recharge la vue courante pour refléter les changements
+                    changerVue();
                 });
             }
         });
