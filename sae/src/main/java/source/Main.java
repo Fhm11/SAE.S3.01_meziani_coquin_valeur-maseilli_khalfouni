@@ -19,7 +19,7 @@ public class Main extends Application {
     private TacheManager modele;
     private ComboBox<String> selecteurVue;
 
-    // Références directes aux vues (remplacent CoordinateurVues)
+    // Références directes aux vues
     private VueBureau vueBureau;
     private VueListe vueListe;
     private VueGantt vueGantt;
@@ -94,21 +94,18 @@ public class Main extends Application {
         barreOutils.setPadding(new Insets(10));
         barreOutils.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #ddd; -fx-border-width: 0 0 1 0;");
 
-        // ===== BOUTON NOUVELLE TÂCHE =====
         Button btnNouvelleTache = new Button("Nouvelle Tâche");
         btnNouvelleTache.setStyle("-fx-font-size: 14px; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 8 15;");
         btnNouvelleTache.setOnAction(evenement -> {
             VueFormulaire.afficherFormulaireCreation(controleur);
         });
 
-        // ===== BOUTON CRÉER COLONNE =====
         Button btnNouvelleColonne = new Button("Créer Colonne");
         btnNouvelleColonne.setStyle("-fx-font-size: 14px; -fx-padding: 8 15;");
         btnNouvelleColonne.setOnAction(evenement -> {
             afficherDialogueCreationColonne();
         });
 
-        // ===== SÉPARATEUR =====
         Separator separateur = new Separator();
         separateur.setOrientation(javafx.geometry.Orientation.VERTICAL);
 
@@ -124,7 +121,6 @@ public class Main extends Application {
             changerVue();
         });
 
-        // ===== ESPACEUR POUR ALIGNER À GAUCHE =====
         Pane espaceur = new Pane();
         HBox.setHgrow(espaceur, Priority.ALWAYS);
 
