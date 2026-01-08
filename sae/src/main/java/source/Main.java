@@ -188,6 +188,11 @@ public class Main extends Application {
         configurerZonesExtractionColonnes();
     }
 
+    /**
+     * configure le drag&drop pour les colonnes de la vueBureau
+     * si sous-tâche, extraction nécessaire avant déplcement
+     * si tâche simple, déplacement direct
+     */
     private void configurerColonnesVueBureau() {
         for (VBox colonneBox : vueBureau.getColonnesGraphiques()) {
             String nomColonne = (String) colonneBox.getUserData();
@@ -220,7 +225,7 @@ public class Main extends Application {
                 if (db.hasString()) {
                     Tache tache = controleur.getTacheEnDeplacement();
                     if (tache != null) {
-                        // Vérifier si c'est une sous-tâche
+                        // vérifier si c'est une sous-tâche
                         boolean estSousTache = false;
                         for (Tache t : modele.getTaches()) {
                             if (estSousTacheRecursif(t, tache)) {
@@ -250,6 +255,13 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * vérifie récursivement si une tâche est sous-tâche d'une autre
+     *
+     * @param parent
+     * @param recherche
+     * @return
+     */
     private boolean estSousTacheRecursif(Tache parent, Tache recherche) {
         if (parent == recherche) {
             return false; // une tâche n'est pas sa propre sous-tâche
@@ -373,6 +385,11 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * configure les interactions pour les sous-tâches
+     * similaire aux cartes principales mais sous-tâches peuvent aussi être extraites
+     * vers des colonnes, peuvent devenir parent si elles sont composites
+     */
     private void configurerSousTachesVueBureau() {
         for (HBox sousTacheBox : vueBureau.getSousTachesBoxes()) {
             Tache sousTache = (Tache) sousTacheBox.getUserData();
@@ -420,7 +437,7 @@ public class Main extends Application {
                 });
 
                 sousTacheBox.setOnDragExited(event -> {
-                    // Restaurer le style original
+                    // restaurer le style original
                     Object styleOrigine = sousTacheBox.getProperties().get("style_origine");
                     if (styleOrigine != null) {
                         sousTacheBox.setStyle((String) styleOrigine);
@@ -451,16 +468,20 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * permet d'extraire des sous-tâches directement vers une colonne
+     * spécifique sans avoir à les déposer dans une tâche parente
+     */
     private void configurerZonesExtractionColonnes() {
         for (VBox colonne : vueBureau.getColonnesGraphiques()) {
             String etatColonne = (String) colonne.getUserData();
 
-            // Créer une zone de drop en haut de la colonne
+            // créer une zone de drop en haut de la colonne
             Pane zoneDropExtraction = new Pane();
             zoneDropExtraction.setPrefHeight(15);
             zoneDropExtraction.setStyle("-fx-background-color: transparent;");
 
-            // Configurer le drop
+            // configurer le drop
             zoneDropExtraction.setOnDragOver(event -> {
                 if (event.getDragboard().hasString()) {
                     event.acceptTransferModes(TransferMode.MOVE);
@@ -484,7 +505,7 @@ public class Main extends Application {
                 if (db.hasString()) {
                     Tache source = controleur.getTacheEnDeplacement();
                     if (source != null) {
-                        // Extraire et mettre dans cette colonne
+                        // extraire et mettre dans cette colonne
                         controleur.extraireVersColonne(source, etatFinal);
                         success = true;
                     }
@@ -590,6 +611,9 @@ public class Main extends Application {
         configurerZonesExtractionListe();
     }
 
+    /**
+     * permet de déplacer des tâches vers des jours spécifiques
+     */
     private void configurerZonesExtractionListe() {
         VBox contenuPrincipal = vueListe.getContenuPrincipal();
 

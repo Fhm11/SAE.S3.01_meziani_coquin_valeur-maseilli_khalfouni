@@ -122,7 +122,6 @@ public class TacheManager implements Sujet {
         }
         t.setTitre(titre);
         t.setDescription(description);
-        t.setPriorite(prio); // AJOUT: Modifier la priorité
         notifierObservateur();
         sauvegarder();
     }
@@ -188,7 +187,7 @@ public class TacheManager implements Sujet {
         if (parent.estComposite()) {
             TacheComposite composite = (TacheComposite) parent;
 
-            // hercher directement dans les sous-tâches
+            // chercher directement dans les sous-tâches
             if (composite.retirerSousTache(aSupprimer)) {
                 return true;
             }
