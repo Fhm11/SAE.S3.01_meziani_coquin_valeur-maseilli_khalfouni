@@ -10,10 +10,8 @@ import javafx.scene.control.Button;
  */
 public class Controller implements EventHandler<ActionEvent> {
 
-    // Référence au modèle
     private TacheManager modele;
 
-    // Tâche en cours de déplacement (pour le drag & drop)
     private Tache tacheEnDeplacement;
 
     /**
@@ -63,8 +61,6 @@ public class Controller implements EventHandler<ActionEvent> {
         }
     }
 
-    // ========== MÉTHODES DE CRÉATION ==========
-
     /**
      * Crée une nouvelle tâche (simple ou composite)
      * @param titre le titre de la tâche
@@ -83,21 +79,7 @@ public class Controller implements EventHandler<ActionEvent> {
         }
     }
 
-    /**
-     * Surcharge pour compatibilité (priorité par défaut)
-     * @param titre le titre de la tâche
-     * @param description sa description
-     * @param estComposite true pour composite
-     * @param debut le jour de début
-     * @param fin le jour de fin
-     */
-    public void creerTache(String titre, String description, boolean estComposite,
-                           String debut, String fin) {
-        // Priorité "Moyenne" par défaut
-        creerTache(titre, description, estComposite, debut, fin, "Moyenne");
-    }
 
-    // ========== MÉTHODES DE MODIFICATION ==========
 
     /**
      * Modifie une tâche existante
@@ -109,19 +91,6 @@ public class Controller implements EventHandler<ActionEvent> {
     public void modifierTache(Tache tache, String titre, String description, String priorite) {
         modele.modifierTache(tache, titre, description, priorite);
     }
-
-    /**
-     * Surcharge pour compatibilité (conserve la priorité existante)
-     * @param tache la tâche à modifier
-     * @param titre le nouveau titre
-     * @param description la nouvelle description
-     */
-    public void modifierTache(Tache tache, String titre, String description) {
-        // Garde la priorité existante
-        modifierTache(tache, titre, description, tache.getPriorite());
-    }
-
-    // ========== MÉTHODES POUR LES SOUS-TÂCHES ==========
 
     /**
      * Ajoute une sous-tâche à une tâche existante
@@ -138,22 +107,6 @@ public class Controller implements EventHandler<ActionEvent> {
         modele.ajouterSousTache(parent, titre, description, estComposite, debut, fin, priorite);
     }
 
-    /**
-     * Surcharge pour compatibilité (priorité par défaut)
-     * @param parent la tâche parente
-     * @param titre le titre de la sous-tâche
-     * @param description sa description
-     * @param estComposite true si composite
-     * @param debut le jour de début
-     * @param fin le jour de fin
-     */
-    public void ajouterSousTache(Tache parent, String titre, String description,
-                                 boolean estComposite, String debut, String fin) {
-        // Priorité "Moyenne" par défaut
-        ajouterSousTache(parent, titre, description, estComposite, debut, fin, "Moyenne");
-    }
-
-    // ========== MÉTHODES POUR LE DRAG & DROP ==========
 
     /**
      * Débute le déplacement d'une tâche (appelé au début du drag)
@@ -208,8 +161,6 @@ public class Controller implements EventHandler<ActionEvent> {
         }
     }
 
-    // ========== MÉTHODES POUR LES COLONNES ==========
-
     /**
      * Ajoute une nouvelle colonne au bureau
      * @param titre le nom de la colonne
@@ -226,7 +177,6 @@ public class Controller implements EventHandler<ActionEvent> {
         modele.supprimerColonne(titre);
     }
 
-    // ========== MÉTHODES POUR LA HIÉRARCHIE DES TÂCHES ==========
 
     /**
      * Fait d'une tâche une sous-tâche d'une autre tâche
@@ -237,13 +187,6 @@ public class Controller implements EventHandler<ActionEvent> {
         modele.devenirSousTacheDe(enfant, parentCible);
     }
 
-    /**
-     * Extrait une sous-tâche pour en faire une tâche principale
-     * @param sousTache la sous-tâche à extraire
-     */
-    public void extraireSousTache(Tache sousTache) {
-        modele.extraireSousTache(sousTache);
-    }
 
     /**
      * Extrait une sous-tâche vers une colonne spécifique
@@ -263,7 +206,6 @@ public class Controller implements EventHandler<ActionEvent> {
         modele.extraireVersJour(sousTache, jour);
     }
 
-    // ========== GETTERS ==========
 
     /**
      * Récupère la tâche en cours de déplacement

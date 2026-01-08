@@ -14,7 +14,6 @@ public class GestionnaireDragDrop {
     private Controller controleur;
     private List<Node> elementsConfigures;
 
-    // Constantes de style
     private static final String STYLE_TACHE_SURVOL = "-fx-border-color: #FF9800; -fx-border-width: 2;";
 
     public GestionnaireDragDrop(Controller controleur) {
@@ -42,7 +41,6 @@ public class GestionnaireDragDrop {
     public void enregistrerCarte(VBox carte, Tache tache) {
         elementsConfigures.add(carte);
 
-        // Si la tâche est composite, configure le drop
         if (tache.estComposite()) {
             configurerDropPourTacheComposite(carte, tache);
         }
@@ -54,7 +52,6 @@ public class GestionnaireDragDrop {
     public void enregistrerSousTache(Node boiteSousTache, Tache sousTache) {
         elementsConfigures.add(boiteSousTache);
 
-        // Si la sous-tâche est composite, configure le drop
         if (sousTache.estComposite()) {
             configurerDropPourTacheComposite(boiteSousTache, sousTache);
         }

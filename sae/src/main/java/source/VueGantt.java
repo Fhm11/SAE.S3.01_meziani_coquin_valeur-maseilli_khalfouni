@@ -204,8 +204,6 @@ public class VueGantt implements Observateur {
         StackPane conteneurBarre = new StackPane(barre);
         conteneurBarre.setPadding(new Insets(0, 5, 0, 5));
 
-        // Ajoute la barre à la grille
-        // Elle s'étend sur plusieurs colonnes selon sa durée
         grille.add(conteneurBarre, indexDebut + 1, numeroLigne, duree, 1);
 
         // Retourne la ligne suivante

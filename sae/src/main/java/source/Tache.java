@@ -30,7 +30,6 @@ public abstract class Tache implements Serializable {
         this.jFin = "Lundi";      // Valeur par défaut
     }
 
-    // Getters et Setters avec validation
 
     public String getTitre() {
         return titre;
@@ -104,7 +103,6 @@ public abstract class Tache implements Serializable {
         return "Tâche : " + titre + " : " + description;
     }
 
-    // Méthodes abstraites du patron Composite
 
     /**
      * Ajoute une sous-tâche à cette tâche
@@ -131,12 +129,10 @@ public abstract class Tache implements Serializable {
      * @return true si la tâche est trouvée dans la hiérarchie
      */
     public boolean contientTache(Tache tacheRecherche) {
-        // Une tâche se contient elle-même
         if (this == tacheRecherche) {
             return true;
         }
 
-        // Si composite, recherche récursive dans les sous-tâches
         if (this.estComposite()) {
             for (Tache sousTache : this.getSousTaches()) {
                 if (sousTache.contientTache(tacheRecherche)) {

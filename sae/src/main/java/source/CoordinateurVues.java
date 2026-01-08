@@ -11,13 +11,11 @@ public class CoordinateurVues {
     private BorderPane racinePrincipale;
     private Controller controleur;
 
-    // références aux vues
     private VueBureau vueBureau;
     private VueListe vueListe;
     private VueGantt vueGantt;
     private VueArchive vueArchive;
 
-    // contrôleurs spécialisés
     private ControllerBureau controleurBureau;
     private ControllerListe controleurListe;
     private ControllerArchive controleurArchive;
@@ -31,18 +29,15 @@ public class CoordinateurVues {
      * Initialise toutes les vues de l'application
      */
     public void initialiserVues(TacheManager modele) {
-        // crée toutes les vues
         vueBureau = new VueBureau(modele);
         vueListe = new VueListe(modele);
         vueGantt = new VueGantt(modele);
         vueArchive = new VueArchive(modele);
 
-        // crée les contrôleurs spécialisés
         controleurBureau = new ControllerBureau(controleur);
         controleurListe = new ControllerListe(controleur);
         controleurArchive = new ControllerArchive(controleur);
 
-        // initialise chaque vue
         vueBureau.actualiser();
         vueListe.actualiser();
         vueGantt.actualiser();

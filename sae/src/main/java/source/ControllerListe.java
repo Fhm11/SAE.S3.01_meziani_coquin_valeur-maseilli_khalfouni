@@ -22,16 +22,12 @@ public class ControllerListe {
      * Configure la vue Liste
      */
     public void configurerVue(VueListe vue) {
-        // Nettoie les anciens handlers
         gestionnaireDragDrop.nettoyer();
 
-        // Configure les boutons
         configurerBoutons(vue);
 
-        // Configure les cartes
         configurerCartes(vue);
 
-        // Configure les zones d'extraction
         configurerZonesExtraction(vue);
     }
 
@@ -47,7 +43,6 @@ public class ControllerListe {
                 String texteBouton = bouton.getText();
 
                 if ("Archiver".equals(texteBouton)) {
-                    // CORRECTION : Utiliser handle() au lieu de finaliserDeplacement
                     bouton.setOnAction(e -> controleur.handle(e));
                 } else if ("+".equals(texteBouton)) {
                     bouton.setOnAction(e -> VueFormulaire.afficherFormulaireSousTache(tache, controleur));
@@ -63,7 +58,6 @@ public class ControllerListe {
         for (VBox carte : vue.getCartesTaches()) {
             Tache tache = (Tache) carte.getUserData();
 
-            // Double-clic pour modification
             carte.setOnMouseClicked(evenement -> {
                 if (evenement.getButton() == MouseButton.PRIMARY &&
                         evenement.getClickCount() == 2) {
@@ -71,7 +65,6 @@ public class ControllerListe {
                 }
             });
 
-            // Drag détecté
             carte.setOnDragDetected(evenement -> {
                 controleur.debuterDeplacement(tache);
                 Dragboard dragboard = carte.startDragAndDrop(TransferMode.MOVE);
@@ -81,7 +74,6 @@ public class ControllerListe {
                 evenement.consume();
             });
 
-            // Enregistre la carte dans le gestionnaire drag drop
             gestionnaireDragDrop.enregistrerCarte(carte, tache);
         }
     }

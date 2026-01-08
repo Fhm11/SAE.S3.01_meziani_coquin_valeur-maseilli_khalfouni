@@ -55,7 +55,6 @@ public class TacheManager implements Sujet {
         return colonnes;
     }
 
-    // === Méthodes de sauvegarde et chargement ===
 
     /**
      * Charge les tâches depuis le fichier de sauvegarde
@@ -129,7 +128,6 @@ public class TacheManager implements Sujet {
         }
     }
 
-    // === Méthodes de gestion des tâches ===
 
     /**
      * Crée une tâche simple
@@ -215,7 +213,6 @@ public class TacheManager implements Sujet {
             throw new IllegalArgumentException("Impossible d'ajouter une sous-tâche");
         }
 
-        // Vérifie que la sous-tâche est dans l'intervalle du parent
         if (!estIntervalleValide(parent, debut, fin)) {
             String message = "La sous-tâche doit être comprise entre " +
                     parent.getJDebut() + " et " + parent.getJFin();
@@ -223,7 +220,6 @@ public class TacheManager implements Sujet {
             throw new IllegalArgumentException(message);
         }
 
-        // Crée la sous-tâche
         Tache sousTache;
         if (estComposite) {
             sousTache = TacheFactory.creerTacheComposite(titre, description, debut, fin, priorite);
@@ -233,7 +229,6 @@ public class TacheManager implements Sujet {
 
         sousTache.setEtat(parent.getEtat());
 
-        // Ajoute au parent
         TacheComposite composite = (TacheComposite) parent;
         composite.ajouterSousTache(sousTache);
 
@@ -248,14 +243,12 @@ public class TacheManager implements Sujet {
     public void supprimerTache(Tache t) {
         if (t == null) return;
 
-        // Essayer de supprimer des tâches principales
         if (listeTaches.remove(t)) {
             notifierObservateur();
             sauvegarderTaches();
             return;
         }
 
-        // Chercher récursivement dans toutes les tâches composites
         for (Tache tache : listeTaches) {
             if (supprimerSousTacheRecursif(tache, t)) {
                 notifierObservateur();
@@ -264,7 +257,6 @@ public class TacheManager implements Sujet {
             }
         }
 
-        // Si on arrive ici, la tâche n'a pas été trouvée
         VueFormulaire.afficherAlerteErreur("Tâche non trouvée", "Erreur de suppression");
     }
 
@@ -278,12 +270,10 @@ public class TacheManager implements Sujet {
         if (parent.estComposite()) {
             TacheComposite composite = (TacheComposite) parent;
 
-            // Chercher directement dans les sous-tâches
             if (composite.retirerSousTache(aSupprimer)) {
                 return true;
             }
 
-            // Chercher récursivement dans les sous-sous-tâches
             for (Tache sousTache : composite.getSousTaches()) {
                 if (supprimerSousTacheRecursif(sousTache, aSupprimer)) {
                     return true;
@@ -293,14 +283,12 @@ public class TacheManager implements Sujet {
         return false;
     }
 
-    // === Méthodes de gestion des colonnes ===
 
     /**
      * Ajoute une nouvelle colonne
      * @param titre le nom de la colonne
      */
     public void ajouterColonne(String titre) {
-        // Vérifie si la colonne existe déjà
         if (colonnes.contains(titre)) {
             VueFormulaire.afficherAlerteErreur("Une colonne avec ce nom existe déjà", "Erreur de création");
             return;
@@ -317,7 +305,6 @@ public class TacheManager implements Sujet {
      */
     public void supprimerColonne(String titre) {
         if (colonnes.remove(titre)) {
-            // Supprime toutes les tâches de cette colonne
             ArrayList<Tache> aSupprimer = new ArrayList<>();
             for (Tache t : listeTaches) {
                 if (t.getEtat().equals(titre)) {
@@ -332,7 +319,6 @@ public class TacheManager implements Sujet {
         }
     }
 
-    // === Méthodes de déplacement ===
 
     /**
      * Déplace une tâche vers une nouvelle colonne (changement d'état)
@@ -376,7 +362,6 @@ public class TacheManager implements Sujet {
         }
     }
 
-    // === Méthodes de gestion de la hiérarchie (sous-tâches) ===
 
     /**
      * Fait d'une tâche une sous-tâche d'une autre
@@ -384,7 +369,6 @@ public class TacheManager implements Sujet {
      * @param nouveauParent la nouvelle tâche parente
      */
     public void devenirSousTacheDe(Tache enfant, Tache nouveauParent) {
-        // Vérifications de base
         if (enfant == null || nouveauParent == null) {
             VueFormulaire.afficherAlerteErreur("Tâche invalide", "Erreur de parentage");
             return;
@@ -402,21 +386,17 @@ public class TacheManager implements Sujet {
             return;
         }
 
-        // Vérifie les cycles (l'enfant ne doit pas contenir le parent)
         if (enfant.contientTache(nouveauParent)) {
             VueFormulaire.afficherAlerteErreur("Erreur : Cycle détecté - l'enfant contient déjà le parent",
                     "Erreur de parentage");
             return;
         }
 
-        // Retire l'enfant de son ancienne position
         boolean retire = false;
 
-        // Chercher dans les tâches principales
         if (listeTaches.remove(enfant)) {
             retire = true;
         } else {
-            // Chercher récursivement dans les sous-tâches
             for (Tache tache : listeTaches) {
                 if (retirerSousTacheRecursif(tache, enfant)) {
                     retire = true;
@@ -425,12 +405,10 @@ public class TacheManager implements Sujet {
             }
         }
 
-        // Ajoute au nouveau parent
         if (retire) {
             TacheComposite parentComposite = (TacheComposite) nouveauParent;
             parentComposite.ajouterSousTache(enfant);
 
-            // Ajuste les jours si nécessaire
             ajusterJoursPourSousTache(enfant, nouveauParent);
 
             notifierObservateur();
@@ -438,26 +416,7 @@ public class TacheManager implements Sujet {
         }
     }
 
-    /**
-     * Vérifie si une tâche est une sous-tâche
-     * @param tache la tâche à vérifier
-     * @return true si c'est une sous-tâche, false si c'est une tâche principale
-     */
-    public boolean estSousTache(Tache tache) {
-        // Si la tâche est dans la liste principale, ce n'est pas une sous-tâche
-        if (listeTaches.contains(tache)) {
-            return false;
-        }
 
-        // Sinon, chercher dans toutes les tâches composites
-        for (Tache tachePrincipale : listeTaches) {
-            if (tachePrincipale.contientTache(tache)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     /**
      * Ajuste les jours d'une sous-tâche pour qu'elle soit dans l'intervalle du parent
@@ -477,12 +436,10 @@ public class TacheManager implements Sujet {
         if (parent.estComposite()) {
             TacheComposite composite = (TacheComposite) parent;
 
-            // Chercher directement
             if (composite.retirerSousTache(aRetirer)) {
                 return true;
             }
 
-            // Chercher récursivement
             for (Tache sousTache : composite.getSousTaches()) {
                 if (retirerSousTacheRecursif(sousTache, aRetirer)) {
                     return true;
@@ -492,20 +449,17 @@ public class TacheManager implements Sujet {
         return false;
     }
 
-    // === Méthodes d'extraction (rendre une sous-tâche principale) ===
 
     /**
      * Extrait une sous-tâche pour en faire une tâche principale
      * @param sousTache la sous-tâche à extraire
      */
     public void extraireSousTache(Tache sousTache) {
-        // Trouver et retirer de son parent
         Tache parent = trouverParent(sousTache);
         if (parent != null && parent.estComposite()) {
             TacheComposite parentComposite = (TacheComposite) parent;
             parentComposite.retirerSousTache(sousTache);
 
-            // Ajouter aux tâches principales
             listeTaches.add(sousTache);
             notifierObservateur();
             sauvegarderTaches();
@@ -523,18 +477,14 @@ public class TacheManager implements Sujet {
     public void extraireVersColonne(Tache sousTache, String etat) {
         if (sousTache == null || etat == null) return;
 
-        // Retirer de n'importe où dans la hiérarchie
         retirerDeTouteHierarchie(sousTache);
 
-        // Ajouter aux principales si nécessaire
         if (!listeTaches.contains(sousTache)) {
             listeTaches.add(sousTache);
         }
 
-        // Changer état
         sousTache.setEtat(etat);
 
-        // Sauvegarder et notifier
         notifierObservateur();
         sauvegarderTaches();
     }
@@ -550,39 +500,31 @@ public class TacheManager implements Sujet {
             return;
         }
 
-        // Retirer de n'importe où dans la hiérarchie
         retirerDeTouteHierarchie(sousTache);
 
-        // Si la sous-tâche n'est pas déjà dans listeTaches, l'ajouter
         if (!listeTaches.contains(sousTache)) {
             listeTaches.add(sousTache);
         }
 
-        // Changer le jour
         sousTache.setJDebut(jour);
 
-        // Ajuster également la date de fin pour conserver la même durée
         int duree = calculerDistance(sousTache.getJFin(), sousTache.getJDebut());
         String nouvelleFin = calculerJourSuivant(jour, duree);
         sousTache.setJFin(nouvelleFin);
 
-        // Notifier et sauvegarder
         notifierObservateur();
         sauvegarderTaches();
     }
 
-    // === Méthodes utilitaires pour la hiérarchie ===
 
     /**
      * Retire une tâche de toute la hiérarchie
      */
     private void retirerDeTouteHierarchie(Tache aRetirer) {
-        // D'abord essayer dans les tâches principales
         if (listeTaches.remove(aRetirer)) {
             return;
         }
 
-        // Sinon chercher récursivement
         for (Tache tache : listeTaches) {
             if (retirerRecursifDeHierarchie(tache, aRetirer)) {
                 return;
@@ -594,12 +536,10 @@ public class TacheManager implements Sujet {
         if (parent.estComposite()) {
             TacheComposite composite = (TacheComposite) parent;
 
-            // Essayer de retirer directement
             if (composite.retirerSousTache(aRetirer)) {
                 return true;
             }
 
-            // Chercher récursivement dans les enfants
             for (Tache sousTache : composite.getSousTaches()) {
                 if (retirerRecursifDeHierarchie(sousTache, aRetirer)) {
                     return true;
@@ -613,7 +553,6 @@ public class TacheManager implements Sujet {
      * Trouve le parent d'une sous-tâche
      */
     private Tache trouverParent(Tache enfant) {
-        // Chercher dans les tâches principales
         for (Tache tache : listeTaches) {
             if (trouverParentRecursif(tache, enfant)) {
                 return tache;
@@ -625,11 +564,9 @@ public class TacheManager implements Sujet {
     private boolean trouverParentRecursif(Tache parent, Tache enfant) {
         if (parent.estComposite()) {
             TacheComposite composite = (TacheComposite) parent;
-            // Vérifier directement
             if (composite.getSousTaches().contains(enfant)) {
                 return true;
             }
-            // Chercher récursivement
             for (Tache sousTache : composite.getSousTaches()) {
                 if (trouverParentRecursif(sousTache, enfant)) {
                     return true;
@@ -639,7 +576,6 @@ public class TacheManager implements Sujet {
         return false;
     }
 
-    // === Méthodes utilitaires pour les dates ===
 
     /**
      * Vérifie si un intervalle de dates est valide par rapport au parent
@@ -676,7 +612,6 @@ public class TacheManager implements Sujet {
         return JOURS_REFERENCE.get(nouvelIdx);
     }
 
-    // === Méthodes du patron Observateur ===
 
     /**
      * Ajoute un observateur

@@ -43,7 +43,6 @@ public class VueBureau implements Observateur {
         racine = new VBox(10);
         racine.setPadding(new Insets(10));
 
-        // Crée un panneau de défilement pour les colonnes
         panneauDefilement = new ScrollPane();
         panneauDefilement.setFitToHeight(true);
         panneauDefilement.setFitToWidth(true);
@@ -52,13 +51,10 @@ public class VueBureau implements Observateur {
         conteneurColonnes = new HBox(15);
         conteneurColonnes.setPadding(new Insets(10));
 
-        // Place le conteneur dans le panneau de défilement
         panneauDefilement.setContent(conteneurColonnes);
 
-        // Fait prendre tout l'espace disponible au panneau
         VBox.setVgrow(panneauDefilement, Priority.ALWAYS);
 
-        // Ajoute le panneau à la racine
         racine.getChildren().addAll(panneauDefilement);
     }
 
@@ -115,19 +111,16 @@ public class VueBureau implements Observateur {
      */
     @Override
     public void actualiser() {
-        // Nettoie les anciens éléments
         conteneurColonnes.getChildren().clear();
         colonnesGraphiques.clear();
         boutonsInteractifs.clear();
         cartesTaches.clear();
         sousTachesBoxes.clear();
 
-        // Crée une colonne pour chaque état/colonne
         for (String nomColonne : modele.getColonnes()) {
             VBox colonneBox = creerColonne(nomColonne);
             colonnesGraphiques.add(colonneBox);
 
-            // Ajoute les tâches de cette colonne
             for (Tache tache : modele.getTaches()) {
                 if (nomColonne.equals(tache.getEtat())) {
                     VBox carte = creerAffichageTache(tache);
@@ -136,7 +129,6 @@ public class VueBureau implements Observateur {
                 }
             }
 
-            // Ajoute la colonne au conteneur
             conteneurColonnes.getChildren().add(colonneBox);
         }
     }
@@ -150,29 +142,23 @@ public class VueBureau implements Observateur {
         VBox conteneur = new VBox(5);
         conteneur.setPadding(new Insets(10));
 
-        // Style de base de la carte
         String styleOrigine = "-fx-background-color: white; " +
                 "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1); " +
                 "-fx-background-radius: 5;";
 
-        // Stocke le style original pour le restaurer plus tard
         conteneur.getProperties().put("style_origine", styleOrigine);
         conteneur.setStyle(styleOrigine);
 
-        // Stocke la tâche dans le conteneur
         conteneur.setUserData(tache);
 
-        // ===== TITRE DE LA TÂCHE =====
         Label labelTitre = new Label(tache.getTitre());
         labelTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
 
-        // ===== INDICATEUR DE PRIORITÉ =====
         Label labelPriorite = new Label(tache.getPriorite().toUpperCase());
         String stylePriorite = "-fx-font-size: 9px; -fx-text-fill: white; " +
                 "-fx-padding: 2 5; -fx-background-radius: 3; " +
                 "-fx-font-weight: bold;";
 
-        // Change la couleur selon la priorité
         if ("Importante".equals(tache.getPriorite())) {
             labelPriorite.setStyle(stylePriorite + "-fx-background-color: #e74c3c;");
         } else if ("Moyenne".equals(tache.getPriorite())) {
@@ -181,20 +167,16 @@ public class VueBureau implements Observateur {
             labelPriorite.setStyle(stylePriorite + "-fx-background-color: #008000;");
         }
 
-        // ===== DESCRIPTION =====
         Label labelDesc = new Label(tache.getDescription());
         labelDesc.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px;");
         labelDesc.setWrapText(true); // Retour à la ligne automatique
 
-        // ===== DATE DE DÉBUT =====
         Label labelDate = new Label("Date début : " + tache.getJDebut());
         labelDate.setStyle("-fx-text-fill: #888888; -fx-font-size: 10px; -fx-font-style: italic;");
 
-        // ===== BOUTONS D'ACTION =====
         HBox boutons = new HBox(5);
         boutons.setAlignment(Pos.CENTER_RIGHT);
 
-        // Bouton "+" pour les tâches composites
         if (tache.estComposite()) {
             Button btnAjouterSous = new Button("+");
             btnAjouterSous.setUserData(tache);
@@ -202,14 +184,12 @@ public class VueBureau implements Observateur {
             boutons.getChildren().add(btnAjouterSous);
         }
 
-        // Bouton "Archiver"
         Button btnArchiver = new Button("Archiver");
         btnArchiver.setStyle("-fx-text-fill: white; -fx-background-color: #e67e22; -fx-font-weight: bold;");
         btnArchiver.setUserData(tache);
         boutonsInteractifs.add(btnArchiver);
         boutons.getChildren().add(btnArchiver);
 
-        // Ajoute tous les éléments au conteneur
         conteneur.getChildren().addAll(
                 labelTitre,
                 labelPriorite,
@@ -218,7 +198,6 @@ public class VueBureau implements Observateur {
                 labelDate
         );
 
-        // Affiche les sous-tâches si la tâche est composite
         if (tache.estComposite()) {
             afficherSousTachesRecursif(tache, conteneur, 1);
         }
@@ -244,7 +223,6 @@ public class VueBureau implements Observateur {
         // Stocke le nom de la colonne
         colonne.setUserData(titre);
 
-        // ===== EN-TÊTE DE LA COLONNE =====
         HBox enTete = new HBox(10);
         enTete.setAlignment(Pos.CENTER_LEFT);
 
@@ -253,7 +231,6 @@ public class VueBureau implements Observateur {
         labelTitre.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(labelTitre, Priority.ALWAYS);
 
-        // Bouton pour supprimer la colonne
         Button btnSupprimerColonne = new Button("X");
         btnSupprimerColonne.setStyle("-fx-text-fill: white; -fx-background-color: #ff4444; " +
                 "-fx-font-size: 10px; -fx-font-weight: bold;");
@@ -301,26 +278,20 @@ public class VueBureau implements Observateur {
     private HBox creerBoiteSousTache(Tache sousTache, int niveau) {
         HBox boite = new HBox(5);
 
-        // Calcule le décalage selon le niveau
         int decalage = 20 + (niveau * 15);
         boite.setPadding(new Insets(2, 0, 2, decalage));
 
-        // Style avec bordure gauche pour montrer la hiérarchie
         boite.setStyle("-fx-border-color: #eeeeee; -fx-border-width: 0 0 0 2;");
 
-        // Stocke la tâche dans la boîte
         boite.setUserData(sousTache);
 
-        // ===== CONTENU DE LA SOUS-TÂCHE =====
         HBox ligne = new HBox(5);
         ligne.setAlignment(Pos.CENTER_LEFT);
 
-        // Titre avec puce
         Label labelTitre = new Label("• " + sousTache.getTitre());
         labelTitre.setStyle("-fx-text-fill: #333333; -fx-font-size: 11px; -fx-font-weight: bold;");
         labelTitre.setUserData(sousTache);
 
-        // Indicateur de priorité
         Label labelPriorite = new Label(sousTache.getPriorite().toUpperCase());
         String stylePriorite = "-fx-font-size: 9px; -fx-text-fill: white; " +
                 "-fx-padding: 2 5; -fx-background-radius: 3; " +
@@ -334,7 +305,6 @@ public class VueBureau implements Observateur {
             labelPriorite.setStyle(stylePriorite + "-fx-background-color: #008000;");
         }
 
-        // Bouton "Archiver"
         Button btnArchiver = new Button("Archiver");
         btnArchiver.setStyle("-fx-font-size: 9px; -fx-text-fill: white; " +
                 "-fx-background-color: #e67e22; -fx-padding: 2 6; " +
@@ -342,12 +312,10 @@ public class VueBureau implements Observateur {
         btnArchiver.setUserData(sousTache);
         boutonsInteractifs.add(btnArchiver);
 
-        // Date de début
         Label labelDate = new Label("déb : " + sousTache.getJDebut());
         labelDate.setStyle("-fx-text-fill: #999999; -fx-font-size: 10px;");
         labelDate.setUserData(sousTache);
 
-        // Bouton "+" si la sous-tâche est composite
         if (sousTache.estComposite()) {
             Button btnAjouter = new Button("+");
             btnAjouter.setStyle("-fx-font-size: 9px; -fx-text-fill: blue;");
@@ -356,16 +324,13 @@ public class VueBureau implements Observateur {
             ligne.getChildren().add(btnAjouter);
         }
 
-        // Ajoute tous les éléments à la ligne
         ligne.getChildren().addAll(labelTitre, labelPriorite, btnArchiver, labelDate);
 
-        // Ajoute la ligne à la boîte
         boite.getChildren().add(ligne);
 
         return boite;
     }
 
-    // Constante de style pour les colonnes (utilisée aussi dans GestionnaireVues)
     private static final String STYLE_COLONNE =
             "-fx-border-color: lightgray; -fx-border-width: 1; -fx-background-color: #f4f4f4;";
 }

@@ -17,14 +17,11 @@ import javafx.scene.layout.VBox;
  */
 public class VueArchive implements Observateur {
 
-    // Référence au modèle
     private TacheManager modele;
 
-    // Composants graphiques
     private ScrollPane panneauDefilement;
     private VBox contenuPrincipal;
 
-    // Liste des boutons interactifs
     private List<Button> boutonsInteractifs = new ArrayList<>();
 
     public VueArchive() {}
@@ -36,7 +33,6 @@ public class VueArchive implements Observateur {
     public VueArchive(TacheManager modele) {
         this.modele = modele;
 
-        // Initialise les composants graphiques
         contenuPrincipal = new VBox(10);
         contenuPrincipal.setPadding(new Insets(10));
 
@@ -66,20 +62,17 @@ public class VueArchive implements Observateur {
      */
     @Override
     public void actualiser() {
-        // Nettoie l'affichage précédent
         contenuPrincipal.getChildren().clear();
         boutonsInteractifs.clear();
 
         boolean archiveVide = true;
 
-        // Parcourt toutes les tâches pour trouver celles archivées
         for (Tache tache : modele.getTaches()) {
             if (chercherArchivesRecursif(tache)) {
                 archiveVide = false;
             }
         }
 
-        // Affiche un message si l'archive est vide
         if (archiveVide) {
             Label labelVide = new Label("Aucune tâche archivée");
             labelVide.setStyle("-fx-text-fill: gray; -fx-font-style: italic; " +
@@ -100,10 +93,8 @@ public class VueArchive implements Observateur {
                 "-fx-border-color: #cccccc; -fx-padding: 10; " +
                 "-fx-background-radius: 5;");
 
-        // Stocke la tâche dans la carte
         carte.setUserData(tache);
 
-        // ===== TITRE AVEC PROVENANCE =====
         String provenance;
         if (tache.getAncienEtat() != null) {
             provenance = tache.getAncienEtat();
@@ -114,21 +105,17 @@ public class VueArchive implements Observateur {
         Label titre = new Label(tache.getTitre() + " (provenance : " + provenance + ")");
         titre.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
-        // ===== DESCRIPTION =====
         Label description = new Label(tache.getDescription());
         description.setStyle("-fx-text-fill: #666;");
 
-        // ===== BOUTONS D'ACTION =====
         HBox boutons = new HBox(10);
         boutons.setAlignment(Pos.CENTER_RIGHT);
 
-        // Bouton "Restaurer"
         Button btnRestaurer = new Button("Restaurer");
         btnRestaurer.setStyle("-fx-text-fill: white; -fx-background-color: #27ae60; -fx-font-weight: bold;");
         btnRestaurer.setUserData(tache);
         boutonsInteractifs.add(btnRestaurer);
 
-        // Bouton "Supprimer"
         Button btnSupprimer = new Button("supprimer");
         btnSupprimer.setStyle("-fx-text-fill: white; -fx-background-color: #c0392b; -fx-font-weight: bold;");
         btnSupprimer.setUserData(tache);
@@ -136,7 +123,6 @@ public class VueArchive implements Observateur {
 
         boutons.getChildren().addAll(btnRestaurer, btnSupprimer);
 
-        // Ajoute tous les éléments à la carte
         carte.getChildren().addAll(titre, description, boutons);
 
         return carte;
@@ -150,13 +136,11 @@ public class VueArchive implements Observateur {
     private boolean chercherArchivesRecursif(Tache tache) {
         boolean trouve = false;
 
-        // Vérifie si cette tâche est archivée
         if ("archive".equals(tache.getEtat())) {
             contenuPrincipal.getChildren().add(creerCarteArchive(tache));
             return true;
         }
 
-        // Si composite, cherche dans les sous-tâches
         if (tache.estComposite()) {
             for (Tache sousTache : tache.getSousTaches()) {
                 if (chercherArchivesRecursif(sousTache)) {

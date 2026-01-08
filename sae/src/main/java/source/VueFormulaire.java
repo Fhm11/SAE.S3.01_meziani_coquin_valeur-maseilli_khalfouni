@@ -22,6 +22,7 @@ public class VueFormulaire {
         alert.setContentText(message);
         alert.initModality(Modality.APPLICATION_MODAL);
         alert.showAndWait();
+        alert.setGraphic(null);
     }
 
     /**

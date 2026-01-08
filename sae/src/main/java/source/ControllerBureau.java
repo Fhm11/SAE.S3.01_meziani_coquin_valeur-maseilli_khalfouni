@@ -161,7 +161,6 @@ public class ControllerBureau {
                 }
             });
 
-            // Drag détecté
             carte.setOnDragDetected(evenement -> {
                 controleur.debuterDeplacement(tache);
                 Dragboard dragboard = carte.startDragAndDrop(TransferMode.MOVE);
@@ -171,7 +170,6 @@ public class ControllerBureau {
                 evenement.consume();
             });
 
-            // Enregistre la carte dans le gestionnaire drag drop
             gestionnaireDragDrop.enregistrerCarte(carte, tache);
         }
     }
@@ -184,7 +182,6 @@ public class ControllerBureau {
             Tache sousTache = (Tache) boiteSousTache.getUserData();
             if (sousTache == null) continue;
 
-            // Double-clic pour modification
             boiteSousTache.setOnMouseClicked(evenement -> {
                 if (evenement.getButton() == MouseButton.PRIMARY &&
                         evenement.getClickCount() == 2) {
@@ -192,7 +189,6 @@ public class ControllerBureau {
                 }
             });
 
-            // Drag détecté
             boiteSousTache.setOnDragDetected(evenement -> {
                 controleur.debuterDeplacement(sousTache);
                 Dragboard dragboard = boiteSousTache.startDragAndDrop(TransferMode.MOVE);
@@ -202,7 +198,6 @@ public class ControllerBureau {
                 evenement.consume();
             });
 
-            // Enregistre la sous-tâche dans le gestionnaire drag drop
             gestionnaireDragDrop.enregistrerSousTache(boiteSousTache, sousTache);
         }
     }
@@ -268,6 +263,7 @@ public class ControllerBureau {
     private void afficherConfirmationSuppressionColonne(String nomColonne) {
         Alert alerte = new Alert(Alert.AlertType.CONFIRMATION);
         alerte.setTitle("Supprimer colonne");
+        alerte.setGraphic(null);
         alerte.setHeaderText("Supprimer la colonne '" + nomColonne + "' ?");
         alerte.setContentText("Cette action supprimera aussi toutes les tâches de cette colonne.");
 

@@ -72,25 +72,21 @@ public class Main extends Application {
         barreOutils.setPadding(new Insets(10));
         barreOutils.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #ddd; -fx-border-width: 0 0 1 0;");
 
-        // ===== BOUTON NOUVELLE TÂCHE =====
         Button btnNouvelleTache = new Button("Nouvelle Tâche");
         btnNouvelleTache.setStyle("-fx-font-size: 14px; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 8 15;");
         btnNouvelleTache.setOnAction(evenement -> {
             VueFormulaire.afficherFormulaireCreation(controleur);
         });
 
-        // ===== BOUTON CRÉER COLONNE =====
         Button btnNouvelleColonne = new Button("Créer Colonne");
         btnNouvelleColonne.setStyle("-fx-font-size: 14px; -fx-padding: 8 15;");
         btnNouvelleColonne.setOnAction(evenement -> {
             afficherDialogueCreationColonne();
         });
 
-        // ===== SÉPARATEUR =====
         Separator separateur = new Separator();
         separateur.setOrientation(javafx.geometry.Orientation.VERTICAL);
 
-        // ===== SÉLECTEUR DE VUE =====
         Label labelVue = new Label("Vue :");
         labelVue.setStyle("-fx-font-weight: bold; -fx-padding: 0 5 0 0;");
 
@@ -102,11 +98,9 @@ public class Main extends Application {
             changerVue();
         });
 
-        // ===== ESPACEUR POUR ALIGNER À GAUCHE =====
         Pane espaceur = new Pane();
         HBox.setHgrow(espaceur, Priority.ALWAYS);
 
-        // Ajoute tous les composants à la barre d'outils
         barreOutils.getChildren().addAll(
                 btnNouvelleTache,
                 btnNouvelleColonne,
@@ -128,10 +122,8 @@ public class Main extends Application {
         dialogue.setHeaderText(null);
         dialogue.setContentText("Entrez le nom :");
 
-        // Attend la saisie de l'utilisateur
         String nom = dialogue.showAndWait().orElse(null);
 
-        // Crée la colonne si le nom n'est pas vide
         if (nom != null && !nom.trim().isEmpty()) {
             controleur.ajouterColonne(nom);
         }
@@ -149,13 +141,11 @@ public class Main extends Application {
      * Configure les observateurs pour les mises à jour automatiques
      */
     private void configurerObservateurs() {
-        // Enregistre toutes les vues comme observatrices
         modele.ajouterObservateur(coordinateurVues.getVueBureau());
         modele.ajouterObservateur(coordinateurVues.getVueListe());
         modele.ajouterObservateur(coordinateurVues.getVueGantt());
         modele.ajouterObservateur(coordinateurVues.getVueArchive());
 
-        // Observateur pour reconfigurer après mise à jour
         modele.ajouterObservateur(new Observateur() {
             @Override
             public void actualiser() {
