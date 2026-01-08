@@ -24,10 +24,12 @@ public class VueArchive implements Observateur {
 
     private List<Button> boutonsInteractifs = new ArrayList<>();
 
-    public VueArchive() {}
+    public VueArchive() {
+    }
 
     /**
      * Constructeur de la vue Archive
+     * 
      * @param modele le gestionnaire de tâches
      */
     public VueArchive(TacheManager modele) {
@@ -43,6 +45,7 @@ public class VueArchive implements Observateur {
 
     /**
      * Récupère la racine de la vue
+     * 
      * @return le panneau de défilement
      */
     public ScrollPane getRacine() {
@@ -51,6 +54,7 @@ public class VueArchive implements Observateur {
 
     /**
      * Récupère la liste des boutons interactifs
+     * 
      * @return la liste des boutons
      */
     public List<Button> getBoutonsInteractifs() {
@@ -74,7 +78,7 @@ public class VueArchive implements Observateur {
         }
 
         if (archiveVide) {
-            Label labelVide = new Label("Aucune tâche archivée");
+            Label labelVide = new Label("0");
             labelVide.setStyle("-fx-text-fill: gray; -fx-font-style: italic; " +
                     "-fx-font-weight: bold; -fx-font-size: 60px;");
             labelVide.setAlignment(Pos.CENTER);
@@ -84,6 +88,7 @@ public class VueArchive implements Observateur {
 
     /**
      * Crée une carte pour une tâche archivée
+     * 
      * @param tache la tâche archivée
      * @return le conteneur VBox de la carte
      */
@@ -130,6 +135,7 @@ public class VueArchive implements Observateur {
 
     /**
      * Cherche récursivement les tâches archivées
+     * 
      * @param tache la tâche à examiner
      * @return true si une tâche archivée a été trouvée
      */
