@@ -30,9 +30,5 @@ Cette application permet de créer des **tableaux**, des **listes** à l'intéri
 * **Khalfouni**
 
 
-## Contact
-
-Pour toute question, suggérez une issue sur le dépôt GitHub ou contactez les contributeurs listés ci-dessus.
-
 ---
 
